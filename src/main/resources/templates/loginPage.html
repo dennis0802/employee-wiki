@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org" lang="en">
+    <head>
+        <meta charset="utf-8" />
+        <link rel="stylesheet" media="all" th:href="@{/styles.css}">
+        <link rel="icon" type="image/x-icon" th:href="@{/img/favicon.ico}">
+        <title>Employee Wiki</title>
+    </head>
+
+    <body>
+        <header>
+            <div>
+                <a href="/index">
+                    <img th:src="@{/img/defaultLogo.png}" alt="Default HRIS logo" width="108px" height="60px"/>
+                </a>
+            </div>
+            <div class="scrollmenu">
+                <a class href="/"><b>Home</b></a>
+                <a class="selected" href="/login"><b>Login</b></a>
+            </div>
+        </header>
+
+        <div id="page">
+            <div style="text-align: center;">
+                <h1>Login</h1>
+
+                <div style="margin-left: 10px;color:red;" th:if="${param.error}">
+                    Invalid username and password.
+                </div>
+                <div style="margin-left: 10px;color:green;" th:if="${param.logout}">
+                    You have been logged out.
+                </div>
+
+                <br/>
+                <form th:action="@{/login}" method="post">
+                    <label for="username"><b>Username:</b> </label>
+                    <input name="username" type="text">
+                    <br/><br/>
+
+                    <label for="password"><b>Password:</b> </label>
+                    <input name="password" type="password">
+                    <br/><br/>
+
+                    <input type="submit" value="Submit">
+                    <br/><br/>
+                </form>
+                
+                <br/>
+            </div>
+        </div>
+
+        <footer>
+            &copy; <span th:text="${year}"></span> <span th:text="${company}">, All rights reserved.</span> <br/>
+            Powered by Employee Wiki&trade; <br/>
+            <a href="#top">Back to Top</a>
+        </footer>
+    </body>
+</html>

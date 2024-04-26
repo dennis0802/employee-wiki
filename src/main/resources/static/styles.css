@@ -1,0 +1,243 @@
+/* Sides of the page */
+@media screen and (max-width: 1920px){
+    #page {
+        float: left;
+        width: 1100px;
+        /*height: 100%;*/
+        padding-left: 0;
+        vertical-align: top;
+        background: #ffffff;
+    }
+
+    body {
+        width: 1100px;
+        height: 100%;
+        margin: auto;
+        border: 0;
+        font-family: Verdana, Arial, Helvetica, sans-serif;
+        font-size: 13px;
+        line-height: 15px;
+        background: #acd7ff;
+    }
+
+    /* Page header */
+    header {
+        height: 125px;
+        width: 1100px;
+        margin: 0;
+        padding: 0;
+        text-align: left;
+        background: #2575de;
+        color: #FFFFFF;
+    }
+
+    .recent img{
+        width: 320px;
+        height: 180px;
+    }
+
+    .showDisplay img{
+        width: 480px;
+        height: 270px;
+    }
+}
+
+@media screen and (max-width: 385px){
+    #page {
+        float: left;
+        width: 385px;
+        /*height: 100%;*/
+        padding-left: 0;
+        vertical-align: top;
+        background: #ffffff;
+    }
+
+    body {
+        width: 385px;
+        height: 854px;
+        margin: auto;
+        border: 0;
+        font-family: Verdana, Arial, Helvetica, sans-serif;
+        font-size: 13px;
+        line-height: 15px;
+        background: #acd7ff;
+    }
+
+    .imgContainer img {
+        width: 223px;
+        height: 200px;
+    }
+
+    /* Page header */
+    header {
+        height: 125px;
+        width: 385px;
+        margin: 0;
+        padding: 0;
+        text-align: left;
+        background: #2575de;
+        color: #FFFFFF;
+    }
+
+    .recent img{
+        width: 80px;
+        height: 45px;
+    }
+
+    .showDisplay img{
+        width: 80px;
+        height: 45px;
+    }
+
+    #landingImg {
+        width: 223px;
+        height: 200px;
+    }
+
+    tr td{
+        font-size: 8px;
+    }
+}
+
+textarea{
+    font-family: Verdana, Arial, Helvetica, sans-serif; 
+    font-size: 10px;
+    resize: none;
+}
+
+table {
+    border-collapse: collapse;
+    vertical-align: top;
+    width: 100%;
+}
+
+tr td {
+    border: 3px solid #999999;
+    text-align: center;
+    vertical-align: text-top;
+}
+  
+tr th {
+    border: 3px solid #2575de;
+    background: #2575de;
+    color: white;
+    text-align: center;
+}
+
+.button {
+    border: none;
+    color: #FFFFFF;
+    padding: 16px 32px;
+    text-align: center;
+    text-decoration: none;
+    display: inline-block;
+    font-size: 16px;
+    margin: 4px 2px;
+    transition-duration: 0.4s;
+    cursor: pointer;
+}
+
+.buttonTheme {
+    background-color: #FFFFFF;
+    color: #000000;
+    border: 2px solid #2575de;
+}
+
+.buttonTheme:hover {
+    background-color: #2575de;
+    color: #FFFFFF;
+}
+
+/* Page header */
+footer {
+    height: 3em;
+    margin: 0;
+    padding: 1em;
+    text-align: center;
+    background: #2575de;
+    color: #FFFFFF;
+    clear: both;
+}
+
+footer a:link{
+    color: #FFFFFF;
+}
+
+footer a:visited{
+    color: #727272
+}
+
+/* General form formatting */
+form{
+    margin-left: 10px;
+}
+
+/* Centre of the page content */
+#page p:not(#page .display-blocks p), #page h1:not(#page .display-blocks h1), #page h2:not(#page .display-blocks h2), 
+#page h3:not(#page .display-blocks h3), #page a:not(#page .display-blocks a), #page img:not(#page .display-blocks img), 
+#page dt:not(#page .display-blocks dt){
+    margin-right: 10px;
+    margin-top:10px;
+    margin-left:10px;
+}
+
+#page .homepage{
+    margin-left:40px !important;
+    margin-top:10px !important;
+}
+
+/* Horizontal scrollbar menu of options */
+header a:link{
+    color:#ffffff
+}
+
+header a:visited{
+    color:#bdbdbd
+}
+
+div.scrollmenu {
+    background-color: rgb(80, 80, 80);
+    overflow: auto;
+    white-space: nowrap;
+    margin-top: 3px;
+}
+
+.selected{
+    background-color: rgb(0, 0, 0);
+}
+
+div.scrollmenu a {
+    display: inline-block;
+    color: white;
+    text-align: center;
+    padding: 12px;
+    text-decoration: none;
+}
+
+div.scrollmenu a:hover {
+    background-color: rgb(148, 148, 148);
+}
+
+/* Calendar toolbar */
+.toolbar {
+    margin-bottom: 20px;
+}
+
+.toolbar button {
+    display: inline-block;
+    text-align: center;
+    background-color: #3c78d8;
+    border: 1px solid #1155cc;
+    color: #fff;
+    padding: 6px 20px;
+    border-radius: 2px;
+    cursor: pointer;
+    margin-right: 5px;
+    width: 100px;
+    text-decoration: none;
+}
+
+.icon-blue:before { background-color: #2e78d6; }
+.icon-green:before { background-color: #6aa84f; }
+.icon-yellow:before { background-color: #efb914; }
+.icon-red:before { background-color: #cc4125; }

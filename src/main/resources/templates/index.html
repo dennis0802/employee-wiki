@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org" lang="en">
+    <head>
+        <meta charset="utf-8" />
+        <link rel="stylesheet" media="all" th:href="@{/styles.css}">
+        <link rel="icon" type="image/x-icon" th:href="@{/img/favicon.ico}">
+        <title>Employee Wiki</title>
+    </head>
+
+    <body>
+        <header>
+            <div>
+                <a href="/index">
+                    <img th:src="@{/img/defaultLogo.png}" alt="Default HRIS logo" width="108px" height="60px"/>
+                </a>
+            </div>
+            <div class="scrollmenu">
+                <a class="selected" href="/"><b>Home</b></a>
+                <a href="/login" th:if="${#strings.isEmpty(username)}"><b>Login</b></a>
+                <a href="/orgChart" th:if="${!#strings.isEmpty(username)}"><b>Organization Chart</b></a>
+                <a href="/gal" th:if="${!#strings.isEmpty(username)}"><b>Global Address List</b></a>
+                <a href="/viewRequests" th:if="${!#strings.isEmpty(username)}"><b>My Time Off Requests</b></a>
+                <a href="/viewPay" th:if="${!#strings.isEmpty(username)}"><b>My Pay</b></a>
+                <a href="/calendar" th:if="${!#strings.isEmpty(username)}"><b>Calendar</b></a>
+                <a href="/resources" th:if="${!#strings.isEmpty(username)}"><b>Resources</b></a>
+                <a href="" th:if="${!#strings.isEmpty(username) and (#strings.equals(role, 'ADMIN') or #strings.equals(role, 'HR'))}"><b>HR/Payroll Menu</b></a>
+                <a href="" th:if="${!#strings.isEmpty(username) and (#strings.equals(role, 'ADMIN'))}"><b>Admin Commands</b></a>
+                <a href="/logout" th:if="${!#strings.isEmpty(username)}"><b>Logout</b></a>
+            </div>
+        </header>
+
+        <div id="page">
+            <div style="text-align: center;">
+                <h1>Employee Wiki</h1>
+                <img id="landingImg" th:src="@{/img/hris.jpg}" alt="Default HRIS image" />
+                <p>
+                    Welcome to Employee Wiki, the wikipedia and employee platform for all your employee experience needs. Here, you can view company information,
+                    make time-off requests, and view your payroll information.
+                </p>
+
+                <p>Select an option to get started.</p>
+
+                <div th:if="${!#strings.isEmpty(username)}">
+                    <table>
+                        <tr>
+                            <th colspan="3"><h2>Recent News</h2></th>
+                        </tr>
+                        <tr th:if="${#lists.isEmpty(news)}">
+                            <td colspan="3">No posts were found.</td>
+                        </tr>
+                        <tr th:unless="${#lists.isEmpty(news)}">
+
+                        </tr>
+                    </table>
+                </div>
+                <div th:unless="${!#strings.isEmpty(username)}">
+                    <div>
+                        <p><b>You must have a registered account before you can continue. Speak to your IT administrator if you need help logging in.</b></p>
+                    </div>
+                </div>
+                
+                <br/>
+            </div>
+        </div>
+
+        <footer>
+            &copy; <span th:text="${year}"></span> <span th:text="${company}">, All rights reserved.</span> <br/>
+            Powered by Employee Wiki&trade; <br/>
+            <a href="#top">Back to Top</a>
+        </footer>
+    </body>
+</html>

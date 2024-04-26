@@ -4,4 +4,6 @@
 * Uses Java, SpringBoot, JPA, HTML, and CSS
 
 ## Installation
-To be completed.
+* Download the latest release from this repository
+* Load the JAR file onto a web server and run command **java -jar show-site.jar**
+* Go to localhost:/8080 to test locally if running on your personal device, otherwise link will be dependent on your setup.

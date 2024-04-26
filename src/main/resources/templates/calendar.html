@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org" lang="en">
+    <head>
+        <meta charset="utf-8" />
+        <link rel="stylesheet" media="all" th:href="@{/styles.css}">
+        <link rel="icon" type="image/x-icon" th:href="@{/img/favicon.ico}">
+        <title>Calendar</title>
+    </head>
+
+    <body>
+        <header>
+            <div>
+                <a href="/index">
+                    <img th:src="@{/img/defaultLogo.png}" alt="Default HRIS logo" width="108px" height="60px"/>
+                </a>
+            </div>
+            <div class="scrollmenu">
+                <a href="/"><b>Home</b></a>
+                <a href="/orgChart" th:if="${!#strings.isEmpty(username)}"><b>Organization Chart</b></a>
+                <a href="/gal" th:if="${!#strings.isEmpty(username)}"><b>Global Address List</b></a>
+                <a href="/viewRequests" th:if="${!#strings.isEmpty(username)}"><b>My Time Off Requests</b></a>
+                <a href="/viewPay" th:if="${!#strings.isEmpty(username)}"><b>My Pay</b></a>
+                <a class="selected" href="/calendar" th:if="${!#strings.isEmpty(username)}"><b>Calendar</b></a>
+                <a href="" th:if="${!#strings.isEmpty(username)}"><b>Resources</b></a>
+                <a href="" th:if="${!#strings.isEmpty(username) and (#strings.equals(role, 'ADMIN') or #strings.equals(role, 'HR'))}"><b>HR/Payroll Menu</b></a>
+                <a href="" th:if="${!#strings.isEmpty(username) and (#strings.equals(role, 'ADMIN'))}"><b>Admin Commands</b></a>
+                <a href="/logout" th:if="${!#strings.isEmpty(username)}"><b>Logout</b></a>
+            </div>
+        </header>
+
+        <div id="page">
+            <h1>Calendar</h1>
+            <p>It is recommended to view this page on a desktop/laptop for ideal user experience. Company-wide events will be listed here.</p>
+            <div style="text-align: center;">
+                <div class="toolbar">
+                    <button id="previous">Previous</button>
+                    <button id="next">Next</button>
+                </div>
+                <div id="dp"></div>
+                <div hidden id="calNav"></div>
+            </div>
+            <br/><br/>
+        </div>
+
+        <footer>
+            &copy; <span th:text="${year}"></span> <span th:text="${company}">, All rights reserved.</span> <br/>
+            Powered by Employee Wiki&trade; <br/>
+            <a href="#top">Back to Top</a>
+        </footer>
+
+        <script src="js/daypilot-all.min.js"></script>
+
+        <script>
+            const datePicker = new DayPilot.Navigator("calNav", {
+                showMonths: 3,
+                skipMonths: 3,
+                selectMode: "Month",
+                onTimeRangeSelected: args => {
+                calendar.update({
+                    startDate: args.day
+                });
+                calendar.events.load("/api/events");
+                }
+            });
+            datePicker.init();
+
+            const calendar = new DayPilot.Month("dp", {
+                eventEndSpec: "Date",
+                eventHeight: 30,
+                eventBarVisible: false,
+                onTimeRangeSelected: async (args) => {
+                    //const modal = await DayPilot.Modal.prompt("Create a new event:", "Event");
+                    const modal = await DayPilot.Modal.form([
+                        {name: "Create a new event:", id: "event"},
+                        {name: "Visible to Everyone?", id: "visibility", type: "checkbox"}
+                    ]);
+                    calendar.clearSelection();
+                    if(modal.canceled){
+                        return;
+                    }
+                    const params = {
+                        start: args.start,
+                        end: args.end,
+                        text: modal.result.event,
+                        isPublic: modal.result.visibility
+                    };
+                    const {data} = await DayPilot.Http.post('/api/events/create', params);
+                    calendar.events.add(data);
+                },
+                onEventMove: async (args) => {
+                    const params = {
+                        id: args.e.id(),
+                        start: args.newStart,
+                        end: args.newEnd
+                    };
+                    const {data} = await DayPilot.Http.post('/api/events/move', params);
+                },
+                onEventResize: async (args) => {
+                    const params = {
+                        id: args.e.id(),
+                        start: args.newStart,
+                        end: args.newEnd
+                    };
+                    const {data} = await DayPilot.Http.post('/api/events/move', params);
+                },
+                onBeforeEventRender: args => {
+                    const color = args.data.color || app.colors.gray;
+                    args.data.backColor = color;
+                    args.data.borderColor = "darker";
+                    args.data.fontColor = "#ffffff";
+                    args.data.areas = [
+                        {
+                        top: 6,
+                        right: 6,
+                        width: 18,
+                        height: 18,
+                        symbol: "../icons/daypilot.svg#minichevron-down-2",
+                        action: "ContextMenu",
+                        backColor: "#ffffff",
+                        fontColor: "#666666",
+                        style: "border: 1px solid #ccc; cursor:pointer; border-radius: 15px;"
+                        }
+                    ];
+                },
+                contextMenu: new DayPilot.Menu({
+                    items: [
+                        {
+                            text: "Delete",
+                            onClick: async (args) => {
+                                const e = args.source;
+                                const params = {
+                                    id: e.id()
+                                };
+                                const {data} = await DayPilot.Http.post('/api/events/delete', params);
+                                calendar.events.remove(e);
+                            }
+                        },
+
+                        {
+                            text: "-"
+                        },
+                        {
+                            text: "Blue",
+                            icon: "icon icon-blue",
+                            onClick: (args) => {
+                                app.updateColor(args.source, app.colors.blue);
+                            }
+                        },
+                        {
+                            text: "Green",
+                            icon: "icon icon-green",
+                            onClick: (args) => {
+                                app.updateColor(args.source, app.colors.green);
+                            }
+                        },
+                        {
+                            text: "Yellow",
+                            icon: "icon icon-yellow",
+                            onClick: (args) => {
+                                app.updateColor(args.source, app.colors.yellow);
+                            }
+                        },
+                        {
+                            text: "Red",
+                            icon: "icon icon-red",
+                            onClick: (args) => {
+                                app.updateColor(args.source, app.colors.red);
+                            }
+                        }, 
+                        {
+                            text: "Auto",
+                            onClick: (args) => {
+                                app.updateColor(args.source, "auto");
+                            }
+                        },
+                    ]
+                })
+            });
+            calendar.init();
+
+            const app = {
+                colors: {
+                    blue: "#2e78d6",
+                    green: "#6aa84f",
+                    yellow: "#efb914",
+                    red: "#cc4125",
+                    gray: "#808080",
+                },
+                elements: {
+                    previous: document.querySelector("#previous"),
+                    next: document.querySelector("#next"),
+                },
+                async updateColor(e, color) {
+                    const params = {
+                        id: e.id(),
+                        color: color
+                    };
+                    const {data} = await DayPilot.Http.post('/api/events/setColor', params);
+                    e.data.color = color;
+                    calendar.events.update(e);
+                },
+
+                init() {
+                    app.elements.previous.addEventListener("click", () => {
+                        const current = datePicker.selectionDay;
+                        datePicker.select(current.addMonths(-1));
+                    });
+                    app.elements.next.addEventListener("click", () => {
+                        const current = datePicker.selectionDay;
+                        datePicker.select(current.addMonths(1));
+                    });
+
+                    calendar.events.load("/api/events");
+                }
+            };
+
+            app.init();
+        </script>
+    </body>
+</html>

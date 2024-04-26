@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org" lang="en">
+    <head>
+        <meta charset="utf-8" />
+        <link rel="stylesheet" media="all" th:href="@{/styles.css}">
+        <link rel="icon" type="image/x-icon" th:href="@{/img/favicon.ico}">
+        <title>Log Out</title>
+    </head>
+
+    <body>
+        <header>
+            <div>
+                <a href="/index">
+                    <img th:src="@{/img/defaultLogo.png}" alt="Default HRIS logo" width="108px" height="60px"/>
+                </a>
+            </div>
+            <div class="scrollmenu">
+                <a href="/"><b>Home</b></a>
+                <a href="/orgChart" th:if="${!#strings.isEmpty(username)}"><b>Organization Chart</b></a>
+                <a href="/gal" th:if="${!#strings.isEmpty(username)}"><b>Global Address List</b></a>
+                <a href="/viewRequests" th:if="${!#strings.isEmpty(username)}"><b>My Time Off Requests</b></a>
+                <a href="/viewPay" th:if="${!#strings.isEmpty(username)}"><b>My Pay</b></a>
+                <a href="/calendar" th:if="${!#strings.isEmpty(username)}"><b>Calendar</b></a>
+                <a href="/resources" th:if="${!#strings.isEmpty(username)}"><b>Resources</b></a>
+                <a href="" th:if="${!#strings.isEmpty(username) and (#strings.equals(role, 'ADMIN') or #strings.equals(role, 'HR'))}"><b>HR/Payroll Menu</b></a>
+                <a href="" th:if="${!#strings.isEmpty(username) and (#strings.equals(role, 'ADMIN'))}"><b>Admin Commands</b></a>
+                <a class="selected" href="/logout" th:if="${!#strings.isEmpty(username)}"><b>Logout</b></a>
+            </div>
+        </header>
+
+        <div id="page">
+            <div style="text-align: center;">
+                <p><b>Are you sure you want to log out?</b></p>
+
+                <form th:action="@{/logout}" method="post">
+                    <input type="submit" value="Sign Out"/>
+                </form>
+            </div>
+            <br/><br/>
+        </div>
+
+        <footer>
+            &copy; <span th:text="${year}"></span> <span th:text="${company}">, All rights reserved.</span> <br/>
+            Powered by Employee Wiki&trade; <br/>
+            <a href="#top">Back to Top</a>
+        </footer>
+    </body>
+</html>
