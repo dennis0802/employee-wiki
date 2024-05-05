@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org" lang="en">
+    <head>
+        <meta charset="utf-8" />
+        <link rel="stylesheet" media="all" th:href="@{/styles.css}">
+        <link rel="icon" type="image/x-icon" th:href="@{/img/favicon.ico}">
+        <title>View Payroll Data</title>
+    </head>
+
+    <body>
+        <header>
+            <div>
+                <a href="/index">
+                    <img th:src="@{/img/defaultLogo.png}" alt="Default HRIS logo" width="108px" height="60px"/>
+                </a>
+            </div>
+            <div class="scrollmenu">
+                <a href="/hrMenu" th:if="${!#strings.isEmpty(username) and (#strings.equals(role, 'ADMIN') or #strings.equals(#strings.substring(role, 0, 2), 'HR'))}"><b>Back to HR/Payroll Menu</b></a>
+            </div>
+        </header>
+
+        <div id="page">
+            <div style="text-align: center;">
+                <p style="color:green" th:if="${!#strings.isEmpty(success)}" th:text="${success}"></p>
+                <div th:if="${!#lists.isEmpty(errors)}">
+                    <p style="color:red;font-weight: bold;">ERRORS</p>
+                    <ul style="list-style-position: inside;padding-left: 0;">
+                        <li style="color:red" th:each="error : ${errors}" th:text="${error}"></li>
+                    </ul>
+                </div>
+
+                <h2>Uploaded Data</h2>
+                <a th:href="'/hrViewPayroll?page=' + ${prevPage} + '&search=' + ${searched}"><button class="button buttonTheme">View Previous Page</button></a>
+                <a th:href="'/hrViewPayroll?page=' + ${nextPage} + '&search=' + ${searched}"><button class="button buttonTheme">View Next Page</button></a>
+                <br/><br/>
+                
+                <p th:if="${totalPages &gt; 0}">You are viewing page <span th:text="${currentPage}"></span> of <span th:text="${totalPages}"></span></p>
+                <p th:if="${!#strings.isEmpty(searched)}"><span th:text="${totalCount}"></span> results for <span th:text="${searched}"></span></p>
+                <span>Search for pay statements: </span> 
+                <form th:action="@{/hrViewPayroll}" method="get">
+                    <input type="text" name="search" id="search" placeholder="Search..."/>
+                    <input type="image" th:src="@{/img/search.png}" alt="Search"/>
+                </form>
+                <hr /><br/>
+
+                <table>
+                    <tr>
+                        <th>User</th>
+                        <th>Statement</th>
+                        <th colspan="2">Pay Period</th>
+                        <th colspan="2">Actions</th>
+                    </tr>
+                    <tr th:each="statement : ${statements}">
+                        <td th:text="${statement.forUser}"></td>
+                        <td><a th:href="@{'/uploads/pay/' + ${statement.dataLocation}}" th:text="${statement.dataLocation}"></a></td>
+                        <td th:text="${#strings.substring(statement.startDate, 0, 10)}"></td>
+                        <td th:text="${#strings.substring(statement.endDate, 0, 10)}"></td>
+                        <td><a th:href="@{'/hrEditPayroll?id=' + ${statement.id}}">Edit</a></td>
+                        <td><a th:href="@{'/hrDeletePayroll?id=' + ${statement.id}}">Delete</a></td>
+                    </tr>
+                </table>
+
+                <h2>Upload Payroll Statement</h2>
+                <form th:action="@{/hrNewStatement}" method="post" th:object="${statementNew}" enctype="multipart/form-data">
+                    <label for="user">*User: </label><br/>
+                    <select name="user" id="user">
+                        <option value="" selected="selected" hidden="hidden">Select a user...</option>
+                        <option th:each="user : ${users}" th:value="${user.username}" th:text="${user.firstName} + ' ' + ${user.lastName}"></option>
+                    </select><br/><br/>
+                    <label for="startDate">*Start Date: </label><br/>
+                    <input type="date" name="startDate" th:field="*{startDate}" /><br/><br/>
+                    <label for="endDate">*End Date: </label><br/>
+                    <input type="date" name="endDate" th:field="*{endDate}" /><br/><br/>
+                    <label for="statement">*Pay Statement: </label><br/>
+                    <input type="file" name="statement" accept="application/pdf" ><br/><br/>
+
+                    <input type="submit" value="Submit Statement"/>
+                </form>
+            </div>
+            <br/><br/>
+        </div>
+
+        <footer>
+            &copy; <span th:text="${year}"></span> <span th:text="${company}">, All rights reserved.</span> <br/>
+            Powered by Employee Wiki&trade; <br/>
+            <a href="#top">Back to Top</a>
+        </footer>
+    </body>
+</html>

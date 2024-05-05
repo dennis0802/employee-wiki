@@ -1,5 +1,9 @@
 package com.development.hris.entities;
 
-public class CustomWebAppElementRepository {
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.stereotype.Repository;
+
+@Repository
+public interface CustomWebAppElementRepository extends JpaRepository<CustomWebAppElement, Long>{
     
 }

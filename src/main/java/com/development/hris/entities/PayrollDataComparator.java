@@ -1,5 +1,10 @@
 package com.development.hris.entities;
 
-public class PayrollDataComparator {
-    // Compare based on the payroll's week of
+import java.util.Comparator;
+
+public class PayrollDataComparator implements Comparator<PayrollData> {
+    @Override
+    public int compare(PayrollData data1, PayrollData data2) {
+       return data1.getStartDate().compareTo(data2.getStartDate());
+    }
 }

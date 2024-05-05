@@ -19,11 +19,11 @@
                 <a href="/orgChart" th:if="${!#strings.isEmpty(username)}"><b>Organization Chart</b></a>
                 <a class="selected" href="/gal" th:if="${!#strings.isEmpty(username)}"><b>Global Address List</b></a>
                 <a href="/viewRequests" th:if="${!#strings.isEmpty(username)}"><b>My Time Off Requests</b></a>
-                <a href="/viewPay" th:if="${!#strings.isEmpty(username)}"><b>My Pay</b></a>
+                <a href="/viewMyPay" th:if="${!#strings.isEmpty(username)}"><b>My Pay</b></a>
                 <a href="/calendar" th:if="${!#strings.isEmpty(username)}"><b>Calendar</b></a>
                 <a href="/resources" th:if="${!#strings.isEmpty(username)}"><b>Resources</b></a>
-                <a href="" th:if="${!#strings.isEmpty(username) and (#strings.equals(role, 'ADMIN') or #strings.equals(role, 'HR'))}"><b>HR/Payroll Menu</b></a>
-                <a href="" th:if="${!#strings.isEmpty(username) and (#strings.equals(role, 'ADMIN'))}"><b>Admin Commands</b></a>
+                <a href="/hrMenu" th:if="${!#strings.isEmpty(username) and (#strings.equals(role, 'ADMIN') or #strings.equals(#strings.substring(role, 0, 2), 'HR'))}"><b>HR/Payroll Menu</b></a>
+                <a href="/adminMenu" th:if="${!#strings.isEmpty(username) and (#strings.equals(role, 'ADMIN'))}"><b>Admin Commands</b></a>
                 <a href="/logout" th:if="${!#strings.isEmpty(username)}"><b>Logout</b></a>
             </div>
         </header>
@@ -39,6 +39,7 @@
                         <th>Email</th>
                         <th>Phone Number</th>
                         <th>Work Location</th>
+                        <th>Reports To</th>
                     </tr>
                     <tr th:each="user : ${allUsers}">
                         <td><span th:text="${user.firstName}"></span> <span th:text="${user.lastName}"></span></td>
@@ -47,6 +48,8 @@
                         <td th:text="${user.email}"></td>
                         <td th:text="${user.phoneNum}"></td>
                         <td th:text="${user.workLocation}"></td>
+                        <td th:if="${!#strings.isEmpty(user.managedBy)}" th:text="${user.managedBy}"></td>
+                        <td th:unless="${!#strings.isEmpty(user.managedBy)}">N/A</td>
                     </tr>
                 </table>
             </div>

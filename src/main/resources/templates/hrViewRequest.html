@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org" lang="en">
+    <head>
+        <meta charset="utf-8" />
+        <link rel="stylesheet" media="all" th:href="@{/styles.css}">
+        <link rel="icon" type="image/x-icon" th:href="@{/img/favicon.ico}">
+        <title>View Time-Off Requests</title>
+    </head>
+
+    <body>
+        <header>
+            <div>
+                <a href="/index">
+                    <img th:src="@{/img/defaultLogo.png}" alt="Default HRIS logo" width="108px" height="60px"/>
+                </a>
+            </div>
+            <div class="scrollmenu">
+                <a href="/hrMenu" th:if="${!#strings.isEmpty(username) and (#strings.equals(role, 'ADMIN') or #strings.equals(role, 'HR'))}"><b>Back to HR/Payroll Menu</b></a>
+            </div>
+        </header>
+
+        <div id="page">
+            <div style="text-align: center;">
+                <p style="color:green" th:if="${!#strings.isEmpty(success)}" th:text="${success}"></p>
+                <div th:if="${!#lists.isEmpty(errors)}">
+                    <p style="color:red;font-weight: bold;">ERRORS</p>
+                    <ul style="list-style-position: inside;padding-left: 0;">
+                        <li style="color:red" th:each="error : ${errors}" th:text="${error}"></li>
+                    </ul>
+                </div>
+
+                <div th:if="${#lists.size(myUsers) &gt; 0}">
+                    <hr/><br/>
+                    <h2>Employees</h2>
+                    <table>
+                        <tr>
+                            <th>Employee Name</th>
+                            <th>Job Title</th>
+                            <th>Employee Join Date</th>
+                            <th>Request</th>
+                        </tr>
+                        <tr th:each="myUser : ${myUsers}">
+                            <td><span th:text="${myUser.firstName}"></span> <span th:text="${myUser.lastName}"></span></td>
+                            <td th:text="${myUser.jobTitle}"></td>
+                            <td th:text="${#strings.substring(myUser.joinDate, 0, 10)}"></td>
+                            <td th:if="${#lists.size(myUser.timeOff) &gt; 0}">
+                                <table>
+                                    <tr>
+                                        <th>Requested Dates</th>
+                                        <th>Reason</th>
+                                        <th>Your Action</th>
+                                        <th colspan="2">Actions</th>
+                                    </tr>
+                                    <tr th:each="request : ${myUser.timeOff}">
+                                        <td><span th:text="${#strings.substring(request.startDate, 0, 10)}"></span> - <span th:text="${#strings.substring(request.endDate, 0, 10)}"></span></td>
+                                        <td th:text="${request.reason}"></td>
+                                        <td th:if="${!request.hrViewed}">Pending</td>
+                                        <td style="color:green" th:if="${request.hrApproved and request.hrViewed}">Approved</td>
+                                        <td style="color:red" th:if="${!request.hrApproved and request.hrViewed}">Denied</td>
+                                        <td><a th:href="@{'/hrActionRequest?id=' + ${request.id} + '&approval=true'}">Approve</a></td>
+                                        <td><a th:href="@{'/hrActionRequest?id=' + ${request.id} + '&approval=false'}">Deny</a></td>
+                                    </tr>
+                                </table>
+                            </td>
+                            <td th:unless="${#lists.size(myUser.timeOff) &gt; 0}">
+                                No pending requests.
+                            </td>
+                        </tr>
+                    </table>
+                </div>
+
+                <div th:unless="${#lists.size(myUsers) &gt; 0}">
+                    <p>No users listed.</p>
+                </div>
+                
+            </div>
+            <br/><br/>
+        </div>
+
+        <footer>
+            &copy; <span th:text="${year}"></span> <span th:text="${company}">, All rights reserved.</span> <br/>
+            Powered by Employee Wiki&trade; <br/>
+            <a href="#top">Back to Top</a>
+        </footer>
+    </body>
+</html>

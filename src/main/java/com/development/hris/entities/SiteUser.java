@@ -40,12 +40,20 @@ public class SiteUser implements Comparable<SiteUser>{
     private boolean isEnabled = false;
     private String phoneNum;
     private String workLocation;
+    private int entitledDays;
+    private String managedBy;
 
     @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Event> events = new ArrayList<Event>();
 
+    @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<PayrollData> pay = new ArrayList<PayrollData>();
+
+    @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<TimeOffRequest> timeOff = new ArrayList<TimeOffRequest>();
+
     public SiteUser(String username, String password, String email, String alternateEmail, String role, String phoneNum, String workLocation, String firstName, 
-                    String lastName, String jobTitle){
+                    String lastName, String jobTitle, int entitledDays){
         this.username = username;
         this.password = password;
         this.firstName = firstName;
@@ -56,6 +64,7 @@ public class SiteUser implements Comparable<SiteUser>{
         this.phoneNum = phoneNum;
         this.jobTitle = jobTitle;
         this.workLocation = workLocation;
+        this.entitledDays = entitledDays;
         this.joinDate = Calendar.getInstance().getTime();
     }
 
