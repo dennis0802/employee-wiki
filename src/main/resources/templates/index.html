@@ -48,10 +48,17 @@
                         <tr th:if="${#lists.isEmpty(news)}">
                             <td colspan="3">No posts were found.</td>
                         </tr>
-                        <tr th:unless="${#lists.isEmpty(news)}">
-
+                        <tr th:unless="${#lists.isEmpty(news)}" >
+                            <td th:each="newsPost : ${news}">
+                                <b><span th:text="${newsPost.title}"></span><br/>
+                                By: <span th:text="${newsPost.author}"></span><br/>
+                                Posted: <span th:text="${newsPost.postDate}"></span><br/></b>
+                                <img th:if="${!#strings.isEmpty(newsPost.imageLocation)}" th:src="@{'uploads/news/' + ${newsPost.imageLocation}}" width="320" height="180"/><br/><br/>
+                                <span th:utext="${newsPost.content}"></span>
+                            </td>
                         </tr>
                     </table>
+                    <a th:if="${!#lists.isEmpty(news)}" href="/viewNews">View all news posts</a>
                 </div>
                 <div th:unless="${!#strings.isEmpty(username)}">
                     <div>

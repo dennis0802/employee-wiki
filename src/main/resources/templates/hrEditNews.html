@@ -4,7 +4,7 @@
         <meta charset="utf-8" />
         <link rel="stylesheet" media="all" th:href="@{/styles.css}">
         <link rel="icon" type="image/x-icon" th:href="@{/img/favicon.ico}">
-        <title>Edit Payroll Data</title>
+        <title>Edit Article</title>
     </head>
 
     <body>
@@ -28,23 +28,23 @@
                     </ul>
                 </div>
 
-                <h2>Edit Payroll Statement</h2>
-                <a th:if="${#strings.equals(role, 'HR_PAYROLL') or #strings.equals(role, 'ADMIN')}" href="/hrViewPayroll"><button class="button buttonTheme">Return to Pay Statements</button></a><br/>
-                <p>NOTE: If you do not want to change the user or pay statement, leave the fields as is.</p>
-                <form th:action="@{'/hrEditPayroll?id=' + ${payroll.id}}" method="post" th:object="${payroll}" enctype="multipart/form-data">
-                    <label for="user">*User: </label><br/>
-                    <select name="user" id="user">
-                        <option value="" selected="selected" hidden="hidden">Select a user...</option>
-                        <option th:each="user : ${users}" th:value="${user.username}" th:text="${user.firstName} + ' ' + ${user.lastName}"></option>
-                    </select><br/><br/>
-                    <label for="startDate">*Start Date: </label><br/>
-                    <input type="date" name="startDate" th:field="*{startDate}" /><br/><br/>
-                    <label for="endDate">*End Date: </label><br/>
-                    <input type="date" name="endDate" th:field="*{endDate}" /><br/><br/>
-                    <label for="statement">*Pay Statement: </label><br/>
-                    <input type="file" name="statement" accept="application/pdf" ><br/><br/>
+                <h2>Edit Article</h2>
+                <a th:if="${#strings.equals(#strings.substring(role, 0, 2), 'HR') or #strings.equals(role, 'ADMIN')}" href="/hrViewNews"><button class="button buttonTheme">Return to News</button></a><br/>
+                <p>NOTE: If you do not want to change the image, leave the field as is.</p>
 
-                    <input type="submit" value="Edit Statement"/>
+                <form th:action="@{'/hrEditNews?id=' + ${article.id}}" method="post" th:object="${article}" enctype="multipart/form-data">
+                    <label for="title">*Title: </label><br/>
+                    <input type="text" name="title" th:field="*{title}" /><br/><br/>
+
+                    <label for="content">*Content</label><br/>
+                    <textarea name="content" rows="25" cols="50" wrap="hard" maxlength="255" th:field="*{content}" style="font-family:Times New Roman, Times, serif; font-size: 12px; white-space: pre-wrap;">
+    
+                    </textarea><br/><br/>
+
+                    <label for="imageLocation">*Image (currently <span th:text="${article.imageLocation}"></span>): </label><br/>
+                    <input type="file" name="image" accept="image/*" ><br/><br/>
+
+                    <input type="submit" value="Edit Article"/>
                 </form>
             </div>
             <br/><br/>

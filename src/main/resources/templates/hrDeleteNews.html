@@ -4,7 +4,7 @@
         <meta charset="utf-8" />
         <link rel="stylesheet" media="all" th:href="@{/styles.css}">
         <link rel="icon" type="image/x-icon" th:href="@{/img/favicon.ico}">
-        <title>Delete Payroll Data</title>
+        <title>Delete News Article</title>
     </head>
 
     <body>
@@ -21,12 +21,12 @@
 
         <div id="page">
             <div style="text-align: center;">
-                <h2>Delete Payroll Statement</h2>
-                <a th:if="${#strings.equals(role, 'HR_PAYROLL') or #strings.equals(role, 'ADMIN')}" href="/hrViewPayroll"><button class="button buttonTheme">Return to Pay Statements</button></a><br/>
-                <p>Are you sure you want to delete this payroll statement for <span th:text="${payroll.forUser}"></span>?</p>
+                <h2>Delete News Article</h2>
+                <a th:if="${#strings.equals(role, 'HR_PAYROLL') or #strings.equals(role, 'ADMIN')}" href="/hrViewNews"><button class="button buttonTheme">Return to News</button></a><br/>
+                <p>Are you sure you want to delete article <span th:text="${article.title}"></span>?</p>
 
-                <form th:action="@{'/hrDeletePayroll?id=' + ${payroll.id}}" method="post" th:object="${payroll}" enctype="multipart/form-data">
-                    <input type="submit" value="Delete Statement"/>
+                <form th:action="@{'/hrDeleteNews?id=' + ${article.id}}" method="post" th:object="${article}" enctype="multipart/form-data">
+                    <input type="submit" value="Delete Article"/>
                 </form>
             </div>
             <br/><br/>

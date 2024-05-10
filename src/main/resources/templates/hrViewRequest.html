@@ -15,7 +15,7 @@
                 </a>
             </div>
             <div class="scrollmenu">
-                <a href="/hrMenu" th:if="${!#strings.isEmpty(username) and (#strings.equals(role, 'ADMIN') or #strings.equals(role, 'HR'))}"><b>Back to HR/Payroll Menu</b></a>
+                <a href="/hrMenu" th:if="${!#strings.isEmpty(username) and (#strings.equals(role, 'ADMIN') or #strings.equals(#strings.substring(role, 0, 2), 'HR'))}"><b>Back to HR/Payroll Menu</b></a>
             </div>
         </header>
 
@@ -30,8 +30,19 @@
                 </div>
 
                 <div th:if="${#lists.size(myUsers) &gt; 0}">
-                    <hr/><br/>
                     <h2>Employees</h2>
+                    <a th:href="'/hrViewRequests?page=' + ${prevPage} + '&search=' + ${searched}"><button class="button buttonTheme">View Previous Page</button></a>
+                    <a th:href="'/hrViewRequests?page=' + ${nextPage} + '&search=' + ${searched}"><button class="button buttonTheme">View Next Page</button></a>
+                    <br/><br/>
+                    <p th:if="${totalPages &gt; 0}">You are viewing page <span th:text="${currentPage}"></span> of <span th:text="${totalPages}"></span></p>
+                    <p th:if="${!#strings.isEmpty(searched)}"><span th:text="${totalCount}"></span> results for <span th:text="${searched}"></span></p>
+                    <span>Search for users: </span> 
+                    <form th:action="@{/hrViewRequests}" method="get">
+                        <input type="text" name="search" id="search" placeholder="Search..."/>
+                        <input type="image" th:src="@{/img/search.png}" alt="Search"/>
+                    </form>
+                    <hr />
+
                     <table>
                         <tr>
                             <th>Employee Name</th>
@@ -71,6 +82,14 @@
 
                 <div th:unless="${#lists.size(myUsers) &gt; 0}">
                     <p>No users listed.</p>
+                    <div th:if="${!#strings.isEmpty(searched)}">
+                        <p><span th:text="${totalCount}"></span> results for <span th:text="${searched}"></span></p>
+                        <span>Search for users: </span> 
+                        <form th:action="@{/hrViewRequests}" method="get">
+                            <input type="text" name="search" id="search" placeholder="Search..."/>
+                            <input type="image" th:src="@{/img/search.png}" alt="Search"/>
+                        </form>
+                    </div>
                 </div>
                 
             </div>

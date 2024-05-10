@@ -39,6 +39,7 @@
                 </div>
 
                 <h2>Time-Off Requests</h2>
+                <p><b>NOTE: For any questions, please contact HR or your manager, <span th:text="${user.managedBy}"></span>.</b></p>
                 <div th:if="${totalPages} &gt; 0">
                     <a th:href="'/viewRequests?page=' + ${prevPage} + '&search=' + ${searched}"><button class="button buttonTheme">View Previous Page</button></a>
                     <a th:href="'/viewRequests?page=' + ${nextPage} + '&search=' + ${searched}"><button class="button buttonTheme">View Next Page</button></a>

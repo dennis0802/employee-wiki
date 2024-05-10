@@ -23,9 +23,9 @@ public class HrisSecurityConfig {
 	public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
 		http
 			.authorizeHttpRequests((requests) -> requests
-				.requestMatchers("/", "/index", "/user", "/styles.css", "/img/*", "/js/*", "/test", "/applicant*").permitAll()
-				.requestMatchers("/hrViewPayroll").hasAuthority("HR_PAYROLL")
-				.requestMatchers("/hr*", "/hrUploads/*").hasAnyAuthority("HR", "HR_PAYROLL")//hasAuthority("HR_PAYROLL")
+				.requestMatchers("/", "/index", "/user", "/styles.css", "/img/*", "/js/*", "/test", "/applicant*", "/error", "/uploads/news/*").permitAll()
+				.requestMatchers("/hrViewPayroll", "/uploads/pay/*").hasAnyAuthority("HR_PAYROLL", "ADMIN")
+				.requestMatchers("/hr*", "/hrUploads/*").hasAnyAuthority("HR", "HR_PAYROLL", "ADMIN")//hasAuthority("HR_PAYROLL")
 				.requestMatchers("/admin*", "/hr*", "/hrUploads/*").hasAuthority("ADMIN")
 				.anyRequest().authenticated()
 			)

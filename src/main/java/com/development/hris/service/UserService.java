@@ -23,6 +23,8 @@ public class UserService implements IUserService{
     private final EventRepository eventRepository;
     private final PayrollDataRepository payrollDataRepository;
     private final TimeOffRequestRepository timeOffRequestRepository;
+    private final NewsRepository newsRepository;
+    private final WhistleInfoRepository whistleInfoRepository;
     private final CustomWebAppElementRepository customWebAppElementRepository;
 
     public void addUser(String username, String password, String email, String altEmail, String role, String phoneNum, String workLocation, String firstName, String lastName, 
@@ -136,10 +138,6 @@ public class UserService implements IUserService{
         userRepository.save(user);
     }
 
-    public void clearRequests(){
-        timeOffRequestRepository.deleteAll();
-    }
-
     public TimeOffRequest getTimeOffRequestById(long id){
         return timeOffRequestRepository.findById(id);
     }
@@ -182,6 +180,45 @@ public class UserService implements IUserService{
         eventRepository.save(e);
         userRepository.save(user);
     }
+
+    // NEWS
+    public List<News> getAllNews(){
+        return newsRepository.findAll();
+    }
+
+    public void addOrEditNews(News article){
+        newsRepository.save(article);
+    }
+
+    public News getNewsById(long id){
+        return newsRepository.findById(id);
+    }
+
+    public void deleteNews(long id){
+        newsRepository.deleteById(id);
+    }
+
+    public void clearNews(){
+        newsRepository.deleteAll();
+    }
+
+    // WHISTLE INFO
+    public void addSubmission(WhistleInfo submission){
+        submission.setPostDate(new Date());
+        whistleInfoRepository.save(submission);
+    }
+
+    public List<WhistleInfo> getAllSubmissions(){
+        return whistleInfoRepository.findAll();
+    }
+
+    public void clearSubmissions(){
+        whistleInfoRepository.deleteAll();
+    }
+
+    // OPEN JOB POSTINGS
+
+    // JOB APPLICATIONS
 
     // WEB ELEMENTS
 }

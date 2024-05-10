@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org" lang="en">
+    <head>
+        <meta charset="utf-8" />
+        <link rel="stylesheet" media="all" th:href="@{/styles.css}">
+        <link rel="icon" type="image/x-icon" th:href="@{/img/favicon.ico}">
+        <title>View News Postings</title>
+    </head>
+
+    <body>
+        <header>
+            <div>
+                <a href="/index">
+                    <img th:src="@{/img/defaultLogo.png}" alt="Default HRIS logo" width="108px" height="60px"/>
+                </a>
+            </div>
+            <div class="scrollmenu">
+                <a href="/hrMenu" th:if="${!#strings.isEmpty(username) and (#strings.equals(role, 'ADMIN') or #strings.equals(#strings.substring(role, 0, 2), 'HR'))}"><b>Back to HR/Payroll Menu</b></a>
+            </div>
+        </header>
+
+        <div id="page">
+            <div style="text-align: center;">
+                <p style="color:green" th:if="${!#strings.isEmpty(success)}" th:text="${success}"></p>
+                <div th:if="${!#lists.isEmpty(errors)}">
+                    <p style="color:red;font-weight: bold;">ERRORS</p>
+                    <ul style="list-style-position: inside;padding-left: 0;">
+                        <li style="color:red" th:each="error : ${errors}" th:text="${error}"></li>
+                    </ul>
+                </div>
+
+                <div th:if="${#lists.size(news) &gt; 0}">
+                    <h2>News Postings</h2>
+                    <a th:href="'/hrViewNews?page=' + ${prevPage} + '&search=' + ${searched}"><button class="button buttonTheme">View Previous Page</button></a>
+                    <a th:href="'/hrViewNews?page=' + ${nextPage} + '&search=' + ${searched}"><button class="button buttonTheme">View Next Page</button></a>
+                    <br/><br/>
+                    
+                    <p th:if="${totalPages &gt; 0}">You are viewing page <span th:text="${currentPage}"></span> of <span th:text="${totalPages}"></span></p>
+                    <p th:if="${!#strings.isEmpty(searched)}"><span th:text="${totalCount}"></span> results for <span th:text="${searched}"></span></p>
+                    <span>Search for articles: </span> 
+                    <form th:action="@{/hrViewNews}" method="get">
+                        <input type="text" name="search" id="search" placeholder="Search..."/>
+                        <input type="image" th:src="@{/img/search.png}" alt="Search"/>
+                    </form>
+
+                    <hr/><br/>
+                    <h2>News Postings</h2>
+                    <table>
+                        <tr>
+                            <th>ID</th>
+                            <th>Title</th>
+                            <th>Author</th>
+                            <th>Content</th>
+                            <th>Post Date</th>
+                            <th colspan="2">Actions</th>
+                        </tr>
+                        <tr th:each="newsPost : ${news}">
+                            <td th:text="${newsPost.id}"></td>
+                            <td th:text="${newsPost.title}"></td>
+                            <td th:text="${newsPost.author}"></td>
+                            <td>
+                                <img th:if="${!#strings.isEmpty(newsPost.imageLocation)}" th:src="@{'/uploads/news/' + ${newsPost.imageLocation}}" width="320" height="180"/><br/>
+                                <span th:utext="${newsPost.content}"></span>
+                            </td>
+                            <td th:text="${newsPost.postDate}"></td>
+                            <td><a th:href="@{'/hrEditNews?id=' + ${newsPost.id}}">Edit</a></td>
+                            <td><a th:href="@{'/hrDeleteNews?id=' + ${newsPost.id}}">Delete</a></td>
+                        </tr>
+                    </table>
+                </div>
+
+                <div th:unless="${#lists.size(news) &gt; 0}">
+                    <h2>News Postings</h2>
+                    <p>No news listed.</p>
+                    <div th:if="${!#strings.isEmpty(searched)}">
+                        <p><span th:text="${totalCount}"></span> results for <span th:text="${searched}"></span></p>
+                        <span>Search for articles: </span> 
+                        <form th:action="@{/hrViewNews}" method="get">
+                            <input type="text" name="search" id="search" placeholder="Search..."/>
+                            <input type="image" th:src="@{/img/search.png}" alt="Search"/>
+                        </form>
+                    </div>
+                </div>
+
+                <hr/>
+
+                <h2>Add News Article</h2>
+                <ul style="list-style-position: inside;">
+                    <li>All news postings require a title and some content. Images are optional.</li>
+                    <li>Try to limit your postings to 255 characters or less.</li>
+                    <li>If submitting an image, try to submit an image size of 320x180</li>
+                    <li>Do not submit an image with the same name and format. If you must use the same image, please name the image file a different name.</li>
+                </ul>
+
+                <form th:action="@{/hrNewArticle}" method="post" th:object="${newArticle}" enctype="multipart/form-data">
+                    <label for="title">*Title: </label><br/>
+                    <input type="text" name="title" th:field="*{title}" /><br/><br/>
+
+                    <label for="content">*Content</label><br/>
+                    <textarea name="content" rows="25" cols="50" wrap="hard" maxlength="255" th:field="*{content}" style="font-family:Times New Roman, Times, serif; font-size: 12px; white-space: pre-wrap;">
+    
+                    </textarea><br/><br/>
+
+                    <label for="imageLocation">*Image: </label><br/>
+                    <input type="file" name="image" accept="image/*" ><br/><br/>
+
+                    <input type="submit" value="Submit Article"/>
+                </form>
+            </div>
+            <br/><br/>
+        </div>
+
+        <footer>
+            &copy; <span th:text="${year}"></span> <span th:text="${company}">, All rights reserved.</span> <br/>
+            Powered by Employee Wiki&trade; <br/>
+            <a href="#top">Back to Top</a>
+        </footer>
+    </body>
+</html>

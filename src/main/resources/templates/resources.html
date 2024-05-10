@@ -30,8 +30,35 @@
 
         <div id="page">
             <div style="text-align: center;">
-                <p><b><span th:text="${company}"></span> Listed Resouces</b></p>
+                <h1><span th:text="${company}"></span> Resources</h1>
+                <hr/>
 
+                <h2>Whistleblower Box</h2>
+                <p>Have a suggestion or need to report an anonymous complaint in the company? Submit the form below:</p>
+                <p>
+                    <b>NOTE:</b> Due to the nature of whistleblower systems, you will <b>NOT</b> be allowed to edit your submission once submitted. Ensure all information is correct to the
+                    best of your ability.
+                </p>
+                <p style="color:green" th:if="${!#strings.isEmpty(success)}" th:text="${success}"></p>
+                <div th:if="${!#lists.isEmpty(errors)}">
+                    <p style="color:red;font-weight: bold;">ERRORS</p>
+                    <ul style="list-style-position: inside;padding-left: 0;">
+                        <li style="color:red" th:each="error : ${errors}" th:text="${error}"></li>
+                    </ul>
+                </div>
+
+                <form th:action="@{/newSubmission}" method="post" th:object="${newSubmission}">
+                    <label for="subject">*Subject:</label><br/>
+                    <input type="text" name="subject" th:field="*{subject}"/><br/><br/>
+                    <label for="content">*Content: </label><br/>
+                    <textarea name="content" rows="25" cols="50" wrap="hard" maxlength="255" th:field="*{content}" style="font-family:Times New Roman, Times, serif; font-size: 12px;">
+
+                    </textarea><br/><br/>
+                    <input type="submit" value="Submit Submission" />
+                </form>
+
+                <hr/>
+                <h2><span th:text="${company}"></span> Other Resouces</h2>
                 <p>There are no available resources.</p>
             </div>
             <br/><br/>

@@ -1,5 +1,0 @@
-TODO: April 18
-Implement pages (this will be updated on a rolling basis)
-
-TODO EVENTUALLY
-Allow regular dumps and backups of the database for recovery (https://www.mastertheboss.com/java-ee/jpa/how-to-dump-an-h2-database/)
