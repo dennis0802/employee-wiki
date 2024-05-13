@@ -32,11 +32,11 @@
             <div style="text-align: center;">
                 <p><b>Please select an option</b></p>
 
-                <a href="/hrViewPostings"><button class="button buttonTheme">View Job Postings</button></a><br/>
-                <a href="/hrViewRequests"><button class="button buttonTheme">View Time-Off Requests</button></a><br/>
+                <a href="/hrViewJobs"><button class="button buttonTheme">View Job Postings</button></a><br/>
+                <a href="/hrViewNews"><button class="button buttonTheme">View News Postings</button></a><br/>
                 <a th:if="${#strings.equals(role, 'HR_PAYROLL') or #strings.equals(role, 'ADMIN')}" href="/hrViewPayroll"><button class="button buttonTheme">View Pay Statements</button></a><br/>
+                <a href="/hrViewRequests"><button class="button buttonTheme">View Time-Off Requests</button></a><br/>
                 <a href="/hrViewWhistleblower"><button class="button buttonTheme">View Whistleblower Box</button></a><br/>
-                <a href="/hrViewNews"><button class="button buttonTheme">View News Postings</button></a>
             </div>
             <br/><br/>
         </div>

@@ -29,9 +29,11 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
 @Controller
 @RequiredArgsConstructor
+@Slf4j
 public class UserController {
     private final UserService userService;
     private final ControllerUtilities controllerUtilities;
@@ -149,7 +151,8 @@ public class UserController {
             return "redirect:/resources";
         }
 
-        userService.addSubmission(submission);
+        WhistleInfo added = userService.addSubmission(submission);
+        log.info("Whistleblower form with id#" + added.getId() + " added.");
         redirectAttributes.addFlashAttribute("success", "Whistleblower form submitted!");
         return "redirect:/resources";
     }
@@ -325,8 +328,9 @@ public class UserController {
         }
 
         user.getTimeOff().add(newRequest);
-        userService.addTimeOffRequest(newRequest, user);
+        long id = userService.addTimeOffRequest(newRequest, user);
         redirectAttributes.addFlashAttribute("success", "Request added!");
+        log.info("Time-off request id#" + id + "submitted.");
         return "redirect:/viewRequests";
     }
 
@@ -407,6 +411,7 @@ public class UserController {
 
         userService.editRequest(editedRequest, oldRequest, user);
         redirectAttributes.addFlashAttribute("success", "Request edited!");
+        log.info("Request id#" + id + "edited.");
         return "redirect:/viewRequests";
     }
 
@@ -429,6 +434,7 @@ public class UserController {
 
         SiteUser user = userService.findByUsername(userDetails.getUsername());
 
+        log.info("Request id#" + request.getId() + " withdrawn.");
         userService.deleteRequest(request, user);
         redirectAttributes.addFlashAttribute("success", "Request withdrawn!");
         return "redirect:/viewRequests";
@@ -477,6 +483,7 @@ public class UserController {
 
         controllerUtilities.checkForCompletedRequest(request);
         redirectAttributes.addFlashAttribute("success", approval.equals("true") ? "Request approved!" : "Request denied!");
+        log.info("Manager to request id#" + id + " viewed request.");
         return "redirect:/viewRequests";
     }
 
@@ -530,7 +537,7 @@ public class UserController {
 
     @GetMapping("/test")
     public String test(){
-        userService.clearSubmissions();
+        userService.clearPostings();
         return "redirect:/index";
     }
 

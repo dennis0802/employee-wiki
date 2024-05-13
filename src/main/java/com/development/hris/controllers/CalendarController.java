@@ -13,6 +13,7 @@ import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.fasterxml.jackson.datatype.jsr310.ser.LocalDateTimeSerializer;
 
 import jakarta.transaction.Transactional;
+import lombok.extern.slf4j.Slf4j;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.format.annotation.DateTimeFormat;
@@ -26,6 +27,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
+@Slf4j
 public class CalendarController {
 
     @Autowired
@@ -77,6 +79,10 @@ public class CalendarController {
         user.getEvents().add(e);
         er.save(e);
 
+        if(params.isPublic){
+            log.info(user.getUsername() + " created event.");
+        }
+        
         return e;
     }
 
@@ -120,6 +126,7 @@ public class CalendarController {
         }
 
         if(!user.getEvents().contains(e)){
+            log.info("User attempted to delete an event that doesn't belong to them.");
             return new EventDeleteResponse() {{
                 message = "Event does not belong to this user.";
             }};

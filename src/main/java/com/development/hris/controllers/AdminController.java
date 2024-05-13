@@ -9,9 +9,11 @@ import org.springframework.web.bind.annotation.GetMapping;
 import com.development.hris.service.ControllerUtilities;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
 @RequiredArgsConstructor
 @Controller
+@Slf4j
 public class AdminController {
     private final ControllerUtilities controllerUtilities;
 

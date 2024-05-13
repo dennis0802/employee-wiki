@@ -26,6 +26,7 @@ public class UserService implements IUserService{
     private final NewsRepository newsRepository;
     private final WhistleInfoRepository whistleInfoRepository;
     private final CustomWebAppElementRepository customWebAppElementRepository;
+    private final OpenJobRepository openJobRepository;
 
     public void addUser(String username, String password, String email, String altEmail, String role, String phoneNum, String workLocation, String firstName, String lastName, 
                         String jobTitle, int entitledDays){
@@ -107,9 +108,10 @@ public class UserService implements IUserService{
         return payrollDataRepository.findAll();
     }
 
-    public void addPay(PayrollData pay, SiteUser user){
-        payrollDataRepository.save(pay);
+    public long addPay(PayrollData pay, SiteUser user){
+        PayrollData saved = payrollDataRepository.save(pay);
         userRepository.save(user);
+        return saved.getId();
     }
 
     public void clearPay(){
@@ -133,9 +135,10 @@ public class UserService implements IUserService{
     }
 
     // TIME REQUESTS
-    public void addTimeOffRequest(TimeOffRequest request, SiteUser user){
-        timeOffRequestRepository.save(request);
+    public long addTimeOffRequest(TimeOffRequest request, SiteUser user){
+        TimeOffRequest saved = timeOffRequestRepository.save(request);
         userRepository.save(user);
+        return saved.getId();
     }
 
     public TimeOffRequest getTimeOffRequestById(long id){
@@ -186,8 +189,8 @@ public class UserService implements IUserService{
         return newsRepository.findAll();
     }
 
-    public void addOrEditNews(News article){
-        newsRepository.save(article);
+    public News addOrEditNews(News article){
+        return newsRepository.save(article);
     }
 
     public News getNewsById(long id){
@@ -203,9 +206,9 @@ public class UserService implements IUserService{
     }
 
     // WHISTLE INFO
-    public void addSubmission(WhistleInfo submission){
+    public WhistleInfo addSubmission(WhistleInfo submission){
         submission.setPostDate(new Date());
-        whistleInfoRepository.save(submission);
+        return whistleInfoRepository.save(submission);
     }
 
     public List<WhistleInfo> getAllSubmissions(){
@@ -217,6 +220,25 @@ public class UserService implements IUserService{
     }
 
     // OPEN JOB POSTINGS
+    public List<OpenJob> getAllJobs(){
+        return openJobRepository.findAll();
+    }
+
+    public OpenJob addOrEditPosting(OpenJob posting){
+        return openJobRepository.save(posting);
+    }
+
+    public OpenJob getJobById(long id){
+        return openJobRepository.findById(id);
+    }
+
+    public void clearPostings(){
+        openJobRepository.deleteAll();
+    }
+
+    public void deleteJob(long id){
+        openJobRepository.deleteById(id);
+    }
 
     // JOB APPLICATIONS
 

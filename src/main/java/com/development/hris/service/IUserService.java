@@ -5,9 +5,11 @@ import java.util.List;
 
 import com.development.hris.entities.Event;
 import com.development.hris.entities.News;
+import com.development.hris.entities.OpenJob;
 import com.development.hris.entities.PayrollData;
 import com.development.hris.entities.SiteUser;
 import com.development.hris.entities.TimeOffRequest;
+import com.development.hris.entities.WhistleInfo;
 
 public interface IUserService {
     /**
@@ -82,8 +84,9 @@ public interface IUserService {
      * Add a new pay statement
      * @param pay The new pay statement
      * @param user The user who owns the pay data
+     * @return The id of the new statement
      */
-    void addPay(PayrollData pay, SiteUser user);
+    long addPay(PayrollData pay, SiteUser user);
 
     /**
      * Edit a pay statement
@@ -109,8 +112,9 @@ public interface IUserService {
      * Add a time off request
      * @param request The request to add
      * @param user The user who created the request
+     * @return The id of the request
      */
-    void addTimeOffRequest(TimeOffRequest request, SiteUser user);
+    long addTimeOffRequest(TimeOffRequest request, SiteUser user);
 
     /**
      * Get a time off request by its id
@@ -154,4 +158,64 @@ public interface IUserService {
      * @return A list of news data in the news repository
      */
     List<News> getAllNews();
+
+    /**
+     * Add or edit a news article
+     * @param article The article to add/edit
+     * @return The news article that was added/edited.
+     */
+    News addOrEditNews(News article);
+
+    /**
+     * Get an article by id
+     * @param id The id of the article
+     * @return The article, or null if not found
+     */
+    News getNewsById(long id);
+
+    /**
+     * Delete a news article
+     * @param id The id of the article to delete
+     */
+    void deleteNews(long id);
+
+    // WHISTLE INFO
+    /**
+     * Add a whistleblower submission
+     * @param submission The submission
+     * @return The added submission
+     */
+    WhistleInfo addSubmission(WhistleInfo submission);
+
+    /**
+     * Get all whistleblower submissions
+     * @return A list of the submissions
+     */
+    List<WhistleInfo> getAllSubmissions();
+
+    // OPEN JOB POSTINGS
+    /**
+     * Get all open job postings
+     * @return A list of open job postings
+     */
+    List<OpenJob> getAllJobs();
+
+    /**
+     * Add or edit a job posting
+     * @param posting The posting to add/edit
+     */
+    OpenJob addOrEditPosting(OpenJob posting);
+
+    /**
+     * Get an posting by id
+     * @param id The id of the posting
+     * @return The posting, or null if not found
+     */
+    OpenJob getJobById(long id);
+
+    /**
+     * Delete a posting
+     * @param id The id of the posting to delete
+     */
+    void deleteJob(long id);
 }

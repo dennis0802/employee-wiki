@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org" lang="en">
+    <head>
+        <meta charset="utf-8" />
+        <link rel="stylesheet" media="all" th:href="@{/styles.css}">
+        <link rel="icon" type="image/x-icon" th:href="@{/img/favicon.ico}">
+        <title>HR Menu</title>
+    </head>
+
+    <body th:if="${#strings.equals(role, 'ADMIN') or #strings.equals(#strings.substring(role, 0, 2), 'HR')}">
+        <header>
+            <div>
+                <a href="/index">
+                    <img th:src="@{/img/defaultLogo.png}" alt="Default HRIS logo" width="108px" height="60px"/>
+                </a>
+            </div>
+            <div class="scrollmenu">
+                <a href="/hrMenu"><b>Back to HR/Payroll Menu</b></a>
+            </div>
+        </header>
+
+        <div id="page">
+            <div style="text-align: center;">
+                <h2>Postings</h2>
+                <p style="color:green" th:if="${!#strings.isEmpty(success)}" th:text="${success}"></p>
+                <div th:if="${!#lists.isEmpty(errors)}">
+                    <p style="color:red;font-weight: bold;">ERRORS</p>
+                    <ul style="list-style-position: inside;padding-left: 0;">
+                        <li style="color:red" th:each="error : ${errors}" th:text="${error}"></li>
+                    </ul>
+                </div>
+
+                <div th:if="${totalPages} &gt; 0">
+                    <a th:href="'/hrViewJobs?page=' + ${prevPage} + '&search=' + ${searched}"><button class="button buttonTheme">View Previous Page</button></a>
+                    <a th:href="'/hrViewJobs?page=' + ${nextPage} + '&search=' + ${searched}"><button class="button buttonTheme">View Next Page</button></a>
+                    <br/><br/>
+
+                    <p>You are viewing page <span th:text="${currentPage}"></span> of <span th:text="${totalPages}"></span></p>
+                    <p th:if="${!#strings.isEmpty(searched)}"><span th:text="${totalCount}"></span> results for <span th:text="${searched}"></span></p>
+                    <span>Search for job postings: </span> 
+                    <form th:action="@{/hrViewJobs}" method="get">
+                        <input type="text" name="search" id="search" placeholder="Search..."/>
+                        <input type="image" th:src="@{/img/search.png}" alt="Search"/>
+                    </form>
+                    <hr /><br/>
+
+                    <table>
+                        <tr>
+                            <th>Position</th>
+                            <th>Link</th>
+                            <th>Posted</th>
+                            <th>Deadline</th>
+                            <th>Active</th>
+                            <th colspan="3">Actions</th>
+                        </tr>
+                        <tr th:each="posting : ${postings}">
+                            <td th:text="${posting.position}"></td>
+                            <td><a th:href="@{'/uploads/postings/' + ${posting.link}}"><span th:text="${posting.link}"></a></span></td>
+                            <td th:text="${#strings.substring(posting.postDate, 0, 10)}"></td>
+                            <td th:text="${#strings.substring(posting.deadline, 0, 10)}"></td>
+                            <td th:if="${posting.isActive}">Active</td>
+                            <td th:unless="${posting.isActive}">Inactive</td>
+                            <td><a th:href="@{'/hrEditPosting?id=' + ${posting.id}}">Edit</a></td>
+                            <td><a th:href="@{'/hrDeletePosting?id=' + ${posting.id}}">Delete</a></td>
+                            <td><a th:href="@{'/hrTogglePosting?id=' + ${posting.id}}">Toggle Active</a></td>
+                        </tr>
+                    </table>
+                </div>
+
+                <div th:unless="${totalPages} &gt; 0">
+                    <p>No postings found.</p>
+
+                    <div th:if="${!#strings.isEmpty(searched)}">
+                        <p><span th:text="${totalCount}"></span> results for <span th:text="${searched}"></span></p>
+                        <span>Search for job postings: </span> 
+                        <form th:action="@{/hrViewJobs}" method="get">
+                            <input type="text" name="search" id="search" placeholder="Search..."/>
+                            <input type="image" th:src="@{/img/search.png}" alt="Search"/>
+                        </form>
+                    </div>
+                </div>
+
+                <hr/>
+                    
+                <h2>Add Posting</h2>
+                <form th:action="@{/hrNewPosting}" method="post" th:object="${newPosting}" enctype="multipart/form-data">
+                    <label for="position">*Position: </label><br/>
+                    <input type="text" name="position" th:field="*{position}" /><br/><br/>
+                    <label for="deadline">*Deadline: </label><br/>
+                    <input type="date" name="deadline" th:field="*{deadline}" /><br/><br/>
+                    <label for="active">Is Active?</label><br/>
+                    <input type="checkbox" name="active" /><br/><br/>
+                    <label for="file">*Posting File: </label><br/>
+                    <input type="file" name="file" accept="application/pdf" ><br/><br/>
+
+                    <input type="submit" value="Upload Posting"/>
+                </form>
+
+            </div>
+            <br/><br/>
+        </div>
+
+        <footer>
+            &copy; <span th:text="${year}"></span> <span th:text="${company}">, All rights reserved.</span> <br/>
+            Powered by Employee Wiki&trade; <br/>
+            <a href="#top">Back to Top</a>
+        </footer>
+    </body>
+
+    <body th:unless="${#strings.equals(role, 'ADMIN') or #strings.equals(#strings.substring(role, 0, 2), 'HR')}">
+        <header>
+            <div>
+                <a href="/viewJobPostings">
+                    <img th:src="@{/img/defaultLogo.png}" alt="Default HRIS logo" width="108px" height="60px"/>
+                </a>
+            </div>
+        </header>
+
+        <footer>
+            &copy; <span th:text="${year}"></span> <span th:text="${company}">, All rights reserved.</span> <br/>
+            Powered by Employee Wiki&trade; <br/>
+            <a href="#top">Back to Top</a>
+        </footer>
+    </body>
+</html>
