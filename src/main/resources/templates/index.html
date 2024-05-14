@@ -59,10 +59,27 @@
                         </tr>
                     </table>
                     <a th:if="${!#lists.isEmpty(news)}" href="/viewNews">View all news posts</a>
+                    <br/><br/>
+                    <a href="/candidateHome">
+                        If you are a prospective internal job seeker and are looking for an exciting opportunity to further your career journey with <span th:text="${company}"></span>, click here!
+                    </a>
                 </div>
                 <div th:unless="${!#strings.isEmpty(username)}">
                     <div>
-                        <p><b>You must have a registered account before you can continue. Speak to your IT administrator if you need help logging in.</b></p>
+                        <p><a href="/login">Click here to login.</a></p>
+
+                        <p>
+                            <b>
+                                You must have a registered account and login before you can continue. Speak to your IT administrator 
+                                if you need help logging in.
+                            </b>
+                        </p>
+
+                        <p>
+                            <a href="/candidateHome">
+                                If you are a prospective job seeker and are looking for an exciting opportunity to work with <span th:text="${company}"></span>, click here!
+                            </a>
+                        </p>
                     </div>
                 </div>
                 

@@ -4,8 +4,6 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
-import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
-import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
@@ -23,7 +21,7 @@ public class HrisSecurityConfig {
 	public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
 		http
 			.authorizeHttpRequests((requests) -> requests
-				.requestMatchers("/", "/index", "/user", "/styles.css", "/img/*", "/js/*", "/test", "/applicant*", "/error", "/uploads/news/*", "/uploads/postings/*").permitAll()
+				.requestMatchers("/", "/index", "/user", "/styles.css", "/img/*", "/js/*", "/test", "/applicant*", "/error", "/uploads/news/*", "/uploads/postings/*", "/candidate*").permitAll()
 				.requestMatchers("/hrViewPayroll", "/uploads/pay/*").hasAnyAuthority("HR_PAYROLL", "ADMIN")
 				.requestMatchers("/hr*", "/hrUploads/*").hasAnyAuthority("HR", "HR_PAYROLL", "ADMIN")
 				.requestMatchers("/admin*", "/hr*", "/hrUploads/*").hasAuthority("ADMIN")

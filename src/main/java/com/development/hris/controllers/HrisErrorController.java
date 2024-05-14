@@ -21,12 +21,15 @@ public class HrisErrorController implements ErrorController  {
             Integer statusCode = Integer.valueOf(status.toString());
         
             if(statusCode == HttpStatus.FORBIDDEN.value()){
+                log.info("Encountered code 403. Insufficient authentication to access resource.");
                 return "error-403";
             }
             else if(statusCode == HttpStatus.NOT_FOUND.value()) {
+                log.info("Encountered code 404. Resource not found.");
                 return "error-404";
             }
             else if(statusCode == HttpStatus.INTERNAL_SERVER_ERROR.value()) {
+                log.info("Encountered code 500. Server was unable to process request.");
                 return "error-500";
             }
         }

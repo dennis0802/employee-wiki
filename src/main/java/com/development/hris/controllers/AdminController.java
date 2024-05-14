@@ -28,4 +28,8 @@ public class AdminController {
         model.addAttribute("company", "TempCompany");
         return "adminMenu";
     }
+
+    // some elements to consider
+    // hr email
+    // resources list
 }

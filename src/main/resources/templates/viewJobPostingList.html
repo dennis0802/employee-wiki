@@ -4,7 +4,8 @@
         <meta charset="utf-8" />
         <link rel="stylesheet" media="all" th:href="@{/styles.css}">
         <link rel="icon" type="image/x-icon" th:href="@{/img/favicon.ico}">
-        <title>HR Menu</title>
+        <title th:if="${#strings.equals(role, 'ADMIN') or #strings.equals(#strings.substring(role, 0, 2), 'HR')}">View Job Postings</title>
+        <title th:unless="${#strings.equals(role, 'ADMIN') or #strings.equals(#strings.substring(role, 0, 2), 'HR')}">Candidate Home</title>
     </head>
 
     <body th:if="${#strings.equals(role, 'ADMIN') or #strings.equals(#strings.substring(role, 0, 2), 'HR')}">
@@ -44,27 +45,27 @@
                     </form>
                     <hr /><br/>
 
-                    <table>
-                        <tr>
-                            <th>Position</th>
-                            <th>Link</th>
-                            <th>Posted</th>
-                            <th>Deadline</th>
-                            <th>Active</th>
-                            <th colspan="3">Actions</th>
-                        </tr>
-                        <tr th:each="posting : ${postings}">
-                            <td th:text="${posting.position}"></td>
-                            <td><a th:href="@{'/uploads/postings/' + ${posting.link}}"><span th:text="${posting.link}"></a></span></td>
-                            <td th:text="${#strings.substring(posting.postDate, 0, 10)}"></td>
-                            <td th:text="${#strings.substring(posting.deadline, 0, 10)}"></td>
-                            <td th:if="${posting.isActive}">Active</td>
-                            <td th:unless="${posting.isActive}">Inactive</td>
-                            <td><a th:href="@{'/hrEditPosting?id=' + ${posting.id}}">Edit</a></td>
-                            <td><a th:href="@{'/hrDeletePosting?id=' + ${posting.id}}">Delete</a></td>
-                            <td><a th:href="@{'/hrTogglePosting?id=' + ${posting.id}}">Toggle Active</a></td>
-                        </tr>
-                    </table>
+                        <table>
+                            <tr>
+                                <th>Position</th>
+                                <th>Link</th>
+                                <th>Posted</th>
+                                <th>Deadline</th>
+                                <th>Active</th>
+                                <th colspan="3">Actions</th>
+                            </tr>
+                            <tr th:each="posting : ${postings}">
+                                <td style="font-weight: bold;" th:text="${posting.position}"></td>
+                                <td><a th:href="@{'/uploads/postings/' + ${posting.link}}" th:text="${posting.link}"></a></td>
+                                <td th:text="${#strings.substring(posting.postDate, 0, 10)}"></td>
+                                <td th:text="${#strings.substring(posting.deadline, 0, 10)}"></td>
+                                <td th:if="${posting.isActive}">Active</td>
+                                <td th:unless="${posting.isActive}">Inactive</td>
+                                <td><a th:href="@{'/hrEditPosting?id=' + ${posting.id}}">Edit</a></td>
+                                <td><a th:href="@{'/hrDeletePosting?id=' + ${posting.id}}">Delete</a></td>
+                                <td><a th:href="@{'/hrTogglePosting?id=' + ${posting.id}}">Toggle Active</a></td>
+                            </tr>
+                        </table>
                 </div>
 
                 <div th:unless="${totalPages} &gt; 0">
@@ -110,11 +111,80 @@
     <body th:unless="${#strings.equals(role, 'ADMIN') or #strings.equals(#strings.substring(role, 0, 2), 'HR')}">
         <header>
             <div>
-                <a href="/viewJobPostings">
+                <a href="/candidateHome">
                     <img th:src="@{/img/defaultLogo.png}" alt="Default HRIS logo" width="108px" height="60px"/>
                 </a>
             </div>
         </header>
+
+        <div id="page">
+            <div style="text-align: center;">
+                <h1>Available Positions</h1>
+                <p>
+                    Employment opportunities will be posted on this website and on recruitment websites.
+                    If you don't match all the requirements, apply anyway! We'd like to talk with you and see
+                    if you'd be a good fit for <span th:text="${company}"></span>! Please submit your resume to
+                    <span style="text-decoration: underline; font-weight: bold;">email here</span> and quote the position number you are applying for. Resumes must
+                    and/or cover letters must be submitted in either MSWord or PDF formats.
+                </p>
+
+                <p>
+                    <span th:text="${company}"></span> is committed to providing accomodation to applicants with disabilties
+                    If you require accomodation for any part of the recruitment process, pleast contact Human Resources at 
+                    <span style="text-decoration: underline; font-weight: bold;">email here</span> and we will work with you to meet your needs.
+                </p>
+
+                <p>If you are an internal employee, you may speak to HR about benefits regarding referring employees and moving forward in your career journey.</p>
+                <a href="/index"><button class="button buttonTheme">Return to Homepage</button></a><br/>
+
+                <div th:if="${!#lists.isEmpty(postings)}">
+                    <a th:href="'/candidateHome?page=' + ${prevPage} + '&search=' + ${searched}"><button class="button buttonTheme">View Previous Page</button></a>
+                    <a th:href="'/candidateHome?page=' + ${nextPage} + '&search=' + ${searched}"><button class="button buttonTheme">View Next Page</button></a>
+                    <br/><br/>
+
+                    <p>You are viewing page <span th:text="${currentPage}"></span> of <span th:text="${totalPages}"></span></p>
+                    <p th:if="${!#strings.isEmpty(searched)}"><span th:text="${totalCount}"></span> results for <span th:text="${searched}"></span></p>
+                    <span>Search for job postings: </span> 
+                    <form th:action="@{/candidateHome}" method="get">
+                        <input type="text" name="search" id="search" placeholder="Search..."/>
+                        <input type="image" th:src="@{/img/search.png}" alt="Search"/>
+                    </form>
+
+                    <br/>
+                    <table>
+                        <tr>
+                        <th>ID</th>
+                        <th>Postion</th>
+                        <th>Open Date</th>
+                        <th>Last Day to Submit</th> 
+                        </tr>
+                        <tr th:each="posting : ${postings}">
+                            <td th:text="${posting.id}"></td>
+                            <td style="font-weight: bold;"><a th:text="${posting.position}" th:href="@{'/uploads/postings/' + ${posting.link}}"></a></td>
+                            <td th:text="${#strings.substring(posting.postDate, 0, 10)}"></td>
+                            <td th:text="${#strings.substring(posting.deadline, 0, 10)}"></td>
+                        </tr>
+                    </table>
+                    <br/>
+                </div>
+                
+                <div th:unless="${!#lists.isEmpty(postings)}">
+                    <p th:if="${baseCount &gt; 0 and !#strings.isEmpty(searched)}">No results found for <span th:text="${searched}"></span></p>
+
+                    <div th:if="${!#strings.isEmpty(searched)}">
+                        <p th:if="${!#strings.isEmpty(searched)}"><span th:text="${totalCount}"></span> results for <span th:text="${searched}"></span></p>
+                        <span>Search for job postings: </span> 
+                        <form th:action="@{/candidateHome}" method="get">
+                            <input type="text" name="search" id="search" placeholder="Search..."/>
+                            <input type="image" th:src="@{/img/search.png}" alt="Search"/>
+                        </form>
+                        <br/>
+                    </div>
+
+                    <p th:if="${not (baseCount &gt; 0)}"><b>Unfortunately, we have no openings available at this time. Please check back again in the future!</b></p>
+                </div>
+            </div>
+        </div>
 
         <footer>
             &copy; <span th:text="${year}"></span> <span th:text="${company}">, All rights reserved.</span> <br/>

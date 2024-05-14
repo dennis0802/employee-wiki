@@ -39,7 +39,8 @@
                 </div>
 
                 <h2>Time-Off Requests</h2>
-                <p><b>NOTE: For any questions, please contact HR or your manager, <span th:text="${user.managedBy}"></span>.</b></p>
+                <p th:if="${!#strings.isEmpty(user.managedBy)}"><b>NOTE: For any questions, please contact HR or your manager, <span th:text="${user.managedBy}"></span>.</b></p>
+                <p th:unless="${!#strings.isEmpty(user.managedBy)}"><b>NOTE: For any questions, please contact HR.</b></p>
                 <div th:if="${totalPages} &gt; 0">
                     <a th:href="'/viewRequests?page=' + ${prevPage} + '&search=' + ${searched}"><button class="button buttonTheme">View Previous Page</button></a>
                     <a th:href="'/viewRequests?page=' + ${nextPage} + '&search=' + ${searched}"><button class="button buttonTheme">View Next Page</button></a>
@@ -68,9 +69,12 @@
                             <td th:text="${request.reason}"></td>
                             <td th:text="${#strings.substring(request.startDate, 0, 10)}"></td>
                             <td th:text="${#strings.substring(request.endDate, 0, 10)}"></td>
-                            <td style="color: green;" th:if="${request.hrViewed and request.managerViewed and (request.hrApproved and request.managerApproved)}">Approved</td>
-                            <td style="color: red;" th:if="${request.hrViewed and request.managerViewed and !(request.hrApproved and request.managerApproved)}">Denied</td>
-                            <td th:if="${!(request.hrViewed and request.managerViewed)}">Pending Approval</td>
+                            <td style="color: green;" th:if="${#strings.isEmpty(user.managedBy) and request.hrViewed and (request.hrApproved)}">Approved</td>
+                            <td style="color: green;" th:if="${!#strings.isEmpty(user.managedBy) and request.hrViewed and request.managerViewed and (request.hrApproved and request.managerApproved)}">Approved</td>
+                            <td style="color: red;" th:if="${#strings.isEmpty(user.managedBy) and request.hrViewed and !(request.hrApproved)}">Denied</td>
+                            <td style="color: red;" th:if="${#!strings.isEmpty(user.managedBy) and request.hrViewed and request.managerViewed and !(request.hrApproved and request.managerApproved)}">Denied</td>
+                            <td th:if="${!(request.hrViewed and request.managerViewed) and !#strings.isEmpty(user.managedBy)}">Pending Approval</td>
+                            <td th:if="${!(request.hrViewed) and #strings.isEmpty(user.managedBy)}">Pending Approval</td>
                             <td><a th:href="${'/editRequest?id=' + request.id}">Edit</a></td>
                             <td><a th:href="${'/withdrawRequest?id=' + request.id}">Withdraw</a></td>
                         </tr>
