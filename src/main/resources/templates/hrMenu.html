@@ -25,7 +25,6 @@
                 <a href="/resources" th:if="${!#strings.isEmpty(username)}"><b>Resources</b></a>
                 <a class="selected" href="/hrMenu" th:if="${!#strings.isEmpty(username) and (#strings.equals(role, 'ADMIN') or #strings.equals(#strings.substring(role, 0, 2), 'HR'))}"><b>HR/Payroll Menu</b></a>
                 <a href="/yourAccount" th:if="${!#strings.isEmpty(username)}"><b>Your Account</b></a>
-                <a href="/logout" th:if="${!#strings.isEmpty(username)}"><b>Logout</b></a>
             </div>
         </header>
 

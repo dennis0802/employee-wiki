@@ -4,6 +4,8 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
+import java.util.Date;
 
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -32,6 +34,7 @@ public class JobApplicantController {
         int min = 0 + (page-1) * (int)ControllerUtilities.VIEW_PER_PAGE, max = ((int)ControllerUtilities.VIEW_PER_PAGE-1) + (page-1) * 25;
         
         List<OpenJob> allJobs = userService.getAllJobs();
+        allJobs = allJobs.stream().filter(p -> p.isActive() && p.getDeadline().after(new Date())).collect(Collectors.toList());
         Collections.sort(allJobs, new OpenJobComparator());
         Collections.reverse(allJobs);
 
@@ -58,6 +61,6 @@ public class JobApplicantController {
         controllerUtilities.preparePagingModel(model, null, null, nextPage, prevPage, searchTerm, userService.getAllJobs().size(), allJobs.size(), totalPages, page);
         controllerUtilities.prepareModelForEntities(model, "postings", toDisplay, false, null, null);
         model.addAttribute("hrEmail", controllerUtilities.getHrEmail());
-        return "viewJobPostingList";
+        return "viewTemplate";
     }
 }

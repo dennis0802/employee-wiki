@@ -7,7 +7,7 @@
         <title>Error</title>
     </head>
 
-    <body>
+    <body >
         <header>
             <div>
                 <a href="/index">
@@ -15,11 +15,58 @@
                     <img th:unless="${!#strings.isEmpty(logo)}" th:src="@{/img/defaultLogo.png}" alt="HRIS logo" width="108px" height="60px"/>
                 </a>
             </div>
+            <div class="scrollmenu">
+                <a href="/"><b>Home</b></a>
+                <a href="/orgChart" th:if="${!#strings.isEmpty(username)}"><b>Organization Chart</b></a>
+                <a href="/gal" th:if="${!#strings.isEmpty(username)}"><b>Global Address List</b></a>
+                <a href="/viewRequests" th:if="${!#strings.isEmpty(username)}"><b>My Time Off Requests</b></a>
+                <a href="/viewMyPay" th:if="${!#strings.isEmpty(username)}"><b>My Pay</b></a>
+                <a href="/calendar" th:if="${!#strings.isEmpty(username)}"><b>Calendar</b></a>
+                <a href="/resources" th:if="${!#strings.isEmpty(username)}"><b>Resources</b></a>
+                <a href="/hrMenu" th:if="${!#strings.isEmpty(username) and (#strings.equals(role, 'ADMIN') or #strings.equals(#strings.substring(role, 0, 2), 'HR'))}"><b>HR/Payroll Menu</b></a>
+                <a href="/yourAccount" th:if="${!#strings.isEmpty(username)}"><b>Your Account</b></a>
+            </div>
         </header>
 
-        <div id="page">
+        <div id="page" th:if="code != 400 and code != 403 and code != 404 and code != 500">
             <div style="text-align: center;">
                 <h1>Something went wrong, please refresh or try again later!</h1>
+                <p><b>Click here to return to the homepage</b></p>
+
+                <a href="/index"><button class="button buttonTheme">Return to Homepage</button></a><br/>
+            </div>
+            <br/><br/>
+        </div>
+
+        <div id="page" th:if="code == 400 or code == 500">
+            <div style="text-align: center;">
+                <h2>The server encountered an error and was unable to complete your request.</h2>
+                <p>Please contact the server administrator to inform them of when the error happened and the actions performed just before the error.</p>
+                <p>More information is available in the server error log.</p>
+
+                <p>Try refreshing or make the request at a later time.</p>
+
+                <br/>
+                <p><b>Click here to return to the homepage</b></p>
+
+                <a href="/index"><button class="button buttonTheme">Return to Homepage</button></a><br/>
+            </div>
+            <br/><br/>
+        </div>
+
+        <div id="page" th:if="code == 403">
+            <div style="text-align: center;">
+                <h1>You are not permitted to access this page.</h1>
+                <p><b>Click here to return to the homepage</b></p>
+
+                <a href="/index"><button class="button buttonTheme">Return to Homepage</button></a><br/>
+            </div>
+            <br/><br/>
+        </div>
+
+        <div id="page" th:if="code == 404">
+            <div style="text-align: center;">
+                <h1>Sorry, we couldn't find the page you were looking for.</h1>
                 <p><b>Click here to return to the homepage</b></p>
 
                 <a href="/index"><button class="button buttonTheme">Return to Homepage</button></a><br/>

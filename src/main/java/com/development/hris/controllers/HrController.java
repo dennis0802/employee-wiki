@@ -112,8 +112,8 @@ public class HrController {
 
         controllerUtilities.prepareBaseModel(model, role, username);
         controllerUtilities.preparePagingModel(model, passedErrors, passedSuccess, nextPage, prevPage, searchTerm, userService.getAllPayData().size(), allPayroll.size(), totalPages, page);
-        controllerUtilities.prepareModelForEntities(model, "statements", toDisplay, true, "statementNew", new PayrollData());
-        return "hrViewPayroll";
+        controllerUtilities.prepareModelForEntities(model, "statementsAsHR", toDisplay, true, "statementNew", new PayrollData());
+        return "viewTemplate";
     }
 
     @PostMapping("/hrNewStatement")
@@ -221,7 +221,7 @@ public class HrController {
         model.addAttribute("errors", passedErrors);
         model.addAttribute("payroll", data);
         model.addAttribute("users", userService.getAllUsers());
-        return "hrEditPayroll";
+        return "editTemplate";
     }
 
     @PostMapping("/hrEditPayroll")
@@ -335,7 +335,7 @@ public class HrController {
 
         controllerUtilities.prepareBaseModel(model, role, username);
         model.addAttribute("payroll", data);
-        return "hrDeletePayroll";
+        return "deleteTemplate";
     }
     
     @PostMapping("/hrDeletePayroll")
@@ -388,8 +388,8 @@ public class HrController {
         
         controllerUtilities.prepareBaseModel(model, role, username);
         controllerUtilities.preparePagingModel(model, null, null, nextPage, prevPage, searchTerm, userService.getAllUsers().size(), allUsers.size(), totalPages, page);
-        controllerUtilities.prepareModelForEntities(model, "myUsers", toDisplay, false, null, null);
-        return "hrViewRequest";
+        controllerUtilities.prepareModelForEntities(model, "myUsersAsHR", toDisplay, false, null, null);
+        return "viewTemplate";
     }
 
     @GetMapping("/hrActionRequest")
@@ -486,8 +486,8 @@ public class HrController {
 
         controllerUtilities.prepareBaseModel(model, role, username);
         controllerUtilities.preparePagingModel(model, passedErrors, passedSuccess, nextPage, prevPage, searchTerm, userService.getAllNews().size(), allNews.size(), totalPages, page);
-        controllerUtilities.prepareModelForEntities(model, "news", toDisplay, true, "newArticle", new News());
-        return "hrViewNews";
+        controllerUtilities.prepareModelForEntities(model, "newsAsHR", toDisplay, true, "newArticle", new News());
+        return "viewTemplate";
     }
 
     @PostMapping("/hrNewArticle")
@@ -574,7 +574,7 @@ public class HrController {
         controllerUtilities.prepareBaseModel(model, role, username);
         model.addAttribute("errors", passedErrors);
         model.addAttribute("article", data);
-        return "hrEditNews";
+        return "editTemplate";
     }
 
     @PostMapping("/hrEditNews")
@@ -659,7 +659,7 @@ public class HrController {
 
         controllerUtilities.prepareBaseModel(model, role, username);
         model.addAttribute("article", article);
-        return "hrDeleteNews";
+        return "deleteTemplate";
     }
 
     @PostMapping("/hrDeleteNews")
@@ -712,7 +712,7 @@ public class HrController {
         controllerUtilities.prepareBaseModel(model, role, username);
         controllerUtilities.preparePagingModel(model, null, null, nextPage, prevPage, searchTerm, userService.getAllSubmissions().size(), allSubmissions.size(), totalPages, page);
         controllerUtilities.prepareModelForEntities(model, "submissions", toDisplay, false, null, null);
-        return "hrViewWhistleInfo";
+        return "viewTemplate";
     }
 
     @GetMapping("/hrViewJobs")
@@ -760,8 +760,8 @@ public class HrController {
 
         controllerUtilities.prepareBaseModel(model, role, username);
         controllerUtilities.preparePagingModel(model, passedErrors, passedSuccess, nextPage, prevPage, searchTerm, userService.getAllJobs().size(), allJobs.size(), totalPages, page);
-        controllerUtilities.prepareModelForEntities(model, "postings", toDisplay, true, "newPosting", new OpenJob(null, null, null, null, false));
-        return "viewJobPostingList";
+        controllerUtilities.prepareModelForEntities(model, "postingsAsHR", toDisplay, true, "newPosting", new OpenJob(null, null, null, null, false));
+        return "viewTemplate";
     }
 
     @PostMapping("/hrNewPosting")
@@ -853,7 +853,7 @@ public class HrController {
         controllerUtilities.prepareBaseModel(model, role, username);
         model.addAttribute("errors", passedErrors);
         model.addAttribute("posting", openJob);
-        return "hrEditPosting";
+        return "editTemplate";
     }
 
     @PostMapping("/hrEditPosting")
@@ -976,7 +976,7 @@ public class HrController {
 
         controllerUtilities.prepareBaseModel(model, role, username);
         model.addAttribute("posting", openJob);
-        return "hrDeletePosting";
+        return "deleteTemplate";
     }
 
     @PostMapping("/hrDeletePosting")

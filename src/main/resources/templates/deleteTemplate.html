@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org" lang="en">
+    <head>
+        <meta charset="utf-8" />
+        <link rel="stylesheet" media="all" th:href="@{/styles.css}">
+        <link rel="icon" type="image/x-icon" th:href="@{/img/favicon.ico}">
+        <title th:if="${user != null}">Delete Account</title>
+        <title th:if="${userByAdmin != null}">Delete User</title>
+        <title th:if="${element != null}">Delete Element</title>
+        <title th:if="${editRequest != null}">Delete Request</title>
+        <title th:if="${article != null}">Delete Article</title>
+        <title th:if="${payroll != null}">Delete Payroll Data</title>
+        <title th:if="${posting != null}">Delete Posting</title>
+    </head>
+
+    <body th:if="${element != null}">
+        <header>
+            <div>
+                <a href="/index">
+                    <img th:if="${!#strings.isEmpty(logo)}" th:src="@{'/img/' + ${logo}}" alt="HRIS logo" width="108px" height="60px"/>
+                    <img th:unless="${!#strings.isEmpty(logo)}" th:src="@{/img/defaultLogo.png}" alt="HRIS logo" width="108px" height="60px"/>
+                </a>
+            </div>
+            <div class="scrollmenu">
+                <a href="/hrMenu" th:if="${!#strings.isEmpty(username) and #strings.equals(role, 'ADMIN')}"><b>Back to HR/Payroll Menu</b></a>
+            </div>
+        </header>
+
+        <div id="page">
+            <div style="text-align: center;">
+                <h2>Delete Element</h2>
+                <a th:if="${#strings.equals(role, 'ADMIN')}" href="/adminAppElements"><button class="button buttonTheme">Return to Elements</button></a><br/>
+                <p>Are you sure you want to delete element <span th:text="${element.description}"></span>?</p>
+
+                <form th:action="@{'/adminDeleteElement?id=' + ${element.id}}" method="post" th:object="${element}" enctype="multipart/form-data">
+                    <input type="submit" value="Delete Element"/>
+                </form>
+            </div>
+            <br/><br/>
+        </div>
+
+        <footer>
+            &copy; <span th:text="${year}"></span> <span th:text="${company}">, All rights reserved.</span> <br/>
+            Powered by Employee Wiki&trade; <br/>
+            <a href="#top">Back to Top</a>
+        </footer>
+    </body>
+
+    <body th:if="${userByAdmin != null}">
+        <header>
+            <div>
+                <a href="/index">
+                    <img th:if="${!#strings.isEmpty(logo)}" th:src="@{'/img/' + ${logo}}" alt="HRIS logo" width="108px" height="60px"/>
+                    <img th:unless="${!#strings.isEmpty(logo)}" th:src="@{/img/defaultLogo.png}" alt="HRIS logo" width="108px" height="60px"/>
+                </a>
+            </div>
+            <div class="scrollmenu">
+                <a href="/gal" th:if="${!#strings.isEmpty(username) and #strings.equals(role, 'ADMIN')}"><b>Back to GAL</b></a>
+            </div>
+        </header>
+
+        <div id="page">
+            <div style="text-align: center;">
+                <h2>Delete User</h2>
+                <a th:if="${#strings.equals(role, 'ADMIN')}" href="/gal"><button class="button buttonTheme">Return to GAL</button></a><br/>
+                <p>Are you sure you want to delete user <span th:text="${userByAdmin.username}"></span>?</p>
+
+                <form th:action="@{'/adminDeleteUser?id=' + ${userByAdmin.id}}" method="post" th:object="${userByAdmin}" enctype="multipart/form-data">
+                    <input type="submit" value="Delete User"/>
+                </form>
+            </div>
+            <br/><br/>
+        </div>
+
+        <footer>
+            &copy; <span th:text="${year}"></span> <span th:text="${company}">, All rights reserved.</span> <br/>
+            Powered by Employee Wiki&trade; <br/>
+            <a href="#top">Back to Top</a>
+        </footer>
+    </body>
+
+    <body th:if="${article != null}">
+        <header>
+            <div>
+                <a href="/index">
+                    <img th:if="${!#strings.isEmpty(logo)}" th:src="@{'/img/' + ${logo}}" alt="HRIS logo" width="108px" height="60px"/>
+                    <img th:unless="${!#strings.isEmpty(logo)}" th:src="@{/img/defaultLogo.png}" alt="HRIS logo" width="108px" height="60px"/>
+                </a>
+            </div>
+            <div class="scrollmenu">
+                <a href="/hrMenu" th:if="${!#strings.isEmpty(username) and (#strings.equals(role, 'ADMIN') or #strings.equals(#strings.substring(role, 0, 2), 'HR'))}"><b>Back to HR/Payroll Menu</b></a>
+            </div>
+        </header>
+
+        <div id="page">
+            <div style="text-align: center;">
+                <h2>Delete News Article</h2>
+                <a th:if="${#strings.equals(role, 'HR_PAYROLL') or #strings.equals(role, 'ADMIN')}" href="/hrViewNews"><button class="button buttonTheme">Return to News</button></a><br/>
+                <p>Are you sure you want to delete article <span th:text="${article.title}"></span>?</p>
+
+                <form th:action="@{'/hrDeleteNews?id=' + ${article.id}}" method="post" th:object="${article}" enctype="multipart/form-data">
+                    <input type="submit" value="Delete Article"/>
+                </form>
+            </div>
+            <br/><br/>
+        </div>
+
+        <footer>
+            &copy; <span th:text="${year}"></span> <span th:text="${company}">, All rights reserved.</span> <br/>
+            Powered by Employee Wiki&trade; <br/>
+            <a href="#top">Back to Top</a>
+        </footer>
+    </body>
+
+    <body th:if="${payroll != null}">
+        <header>
+            <div>
+                <a href="/index">
+                    <img th:if="${!#strings.isEmpty(logo)}" th:src="@{'/img/' + ${logo}}" alt="HRIS logo" width="108px" height="60px"/>
+                    <img th:unless="${!#strings.isEmpty(logo)}" th:src="@{/img/defaultLogo.png}" alt="HRIS logo" width="108px" height="60px"/>
+                </a>
+            </div>
+            <div class="scrollmenu">
+                <a href="/hrMenu" th:if="${!#strings.isEmpty(username) and (#strings.equals(role, 'ADMIN') or #strings.equals(#strings.substring(role, 0, 2), 'HR'))}"><b>Back to HR/Payroll Menu</b></a>
+            </div>
+        </header>
+
+        <div id="page">
+            <div style="text-align: center;">
+                <h2>Delete Payroll Statement</h2>
+                <a th:if="${#strings.equals(role, 'HR_PAYROLL') or #strings.equals(role, 'ADMIN')}" href="/hrViewPayroll"><button class="button buttonTheme">Return to Pay Statements</button></a><br/>
+                <p>Are you sure you want to delete this payroll statement for <span th:text="${payroll.forUser}"></span>?</p>
+
+                <form th:action="@{'/hrDeletePayroll?id=' + ${payroll.id}}" method="post" th:object="${payroll}" enctype="multipart/form-data">
+                    <input type="submit" value="Delete Statement"/>
+                </form>
+            </div>
+            <br/><br/>
+        </div>
+
+        <footer>
+            &copy; <span th:text="${year}"></span> <span th:text="${company}">, All rights reserved.</span> <br/>
+            Powered by Employee Wiki&trade; <br/>
+            <a href="#top">Back to Top</a>
+        </footer>
+    </body>
+
+    <body th:if="${posting != null}">
+        <header>
+            <div>
+                <a href="/index">
+                    <img th:if="${!#strings.isEmpty(logo)}" th:src="@{'/img/' + ${logo}}" alt="HRIS logo" width="108px" height="60px"/>
+                    <img th:unless="${!#strings.isEmpty(logo)}" th:src="@{/img/defaultLogo.png}" alt="HRIS logo" width="108px" height="60px"/>
+                </a>
+            </div>
+            <div class="scrollmenu">
+                <a href="/hrMenu" th:if="${!#strings.isEmpty(username) and (#strings.equals(role, 'ADMIN') or #strings.equals(#strings.substring(role, 0, 2), 'HR'))}"><b>Back to HR/Payroll Menu</b></a>
+            </div>
+        </header>
+
+        <div id="page">
+            <div style="text-align: center;">
+                <h2>Delete Posting</h2>
+                <a th:if="${#strings.equals(#strings.substring(role, 0, 2), 'HR') or #strings.equals(role, 'ADMIN')}" href="/hrViewJobs"><button class="button buttonTheme">Return to Jobs</button></a><br/>
+                <p>Are you sure you want to delete posting for the <span th:text="${posting.position}"></span> role?</p>
+
+                <form th:action="@{'/hrDeletePosting?id=' + ${posting.id}}" method="post" th:object="${posting}" enctype="multipart/form-data">
+                    <input type="submit" value="Delete Posting"/>
+                </form>
+            </div>
+            <br/><br/>
+        </div>
+
+        <footer>
+            &copy; <span th:text="${year}"></span> <span th:text="${company}">, All rights reserved.</span> <br/>
+            Powered by Employee Wiki&trade; <br/>
+            <a href="#top">Back to Top</a>
+        </footer>
+    </body>
+
+</html>

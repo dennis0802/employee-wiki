@@ -13,6 +13,8 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import com.development.hris.entities.CustomWebAppElement;
 import com.development.hris.entities.CustomWebAppElementComparator;
+import com.development.hris.entities.Event;
+import com.development.hris.entities.PayrollData;
 import com.development.hris.entities.SiteUser;
 import com.development.hris.service.ControllerUtilities;
 import com.development.hris.service.UserService;
@@ -34,6 +36,7 @@ import java.util.Collections;
 import java.util.Map;
 import java.util.Date;
 import java.util.regex.*;
+import java.util.stream.Collectors;
 
 @RequiredArgsConstructor
 @Controller
@@ -199,7 +202,7 @@ public class AdminController {
         controllerUtilities.prepareBaseModel(model, role, username);
         model.addAttribute("errors", passedErrors);
         model.addAttribute("element", customWebAppElement);
-        return "adminEditElement";
+        return "editTemplate";
     }
 
     @PostMapping("/adminEditElement")
@@ -343,7 +346,7 @@ public class AdminController {
 
         controllerUtilities.prepareBaseModel(model, role, username);
         model.addAttribute("element", element);
-        return "adminDeleteElement";
+        return "deleteTemplate";
     }
 
     @PostMapping("/adminDeleteElement")
@@ -512,8 +515,8 @@ public class AdminController {
 
         controllerUtilities.prepareBaseModel(model, role, username);
         model.addAttribute("errors", passedErrors);
-        model.addAttribute("user", siteUser);
-        return "adminEditUser";
+        model.addAttribute("userByAdmin", siteUser);
+        return "editTemplate";
     }
 
     @PostMapping("/adminEditUser")
@@ -600,6 +603,28 @@ public class AdminController {
         log.info("User " + specified.getUsername() + " with id#" + user.getId() + " has been edited");
         redirectAttributes.addFlashAttribute("success", "User edited!");
         if(!oldUsername.equals(specified.getUsername())){
+            List<SiteUser> managedUsersByThisUser = userService.getAllUsers().stream().filter(u -> u.getManagedBy().equals(oldUsername)).collect(Collectors.toList());
+            for (SiteUser siteUser : managedUsersByThisUser) {
+                siteUser.setManagedBy(managedBy);
+                userService.saveUser(siteUser);
+            }
+
+            List<PayrollData> temp = specified.getPay();
+            for(PayrollData pay : temp){
+                specified.getPay().remove(pay);
+                pay.setForUser(user.getUsername());
+                specified.getPay().add(pay);
+                userService.editPay(pay, specified);
+            }
+
+            List<Event> tempEvents = specified.getEvents();
+            for(Event event : tempEvents){
+                if(event.getText().contains(oldUsername)){
+                    event.setText(event.getText().replace(oldUsername, user.getUsername()));
+                }
+            }
+            log.info("Managed users, pay, and events have been transferred to the new username");
+
             try {
                 httpServletRequest.logout();
             } catch (Exception e) {
@@ -611,7 +636,6 @@ public class AdminController {
 
         return "redirect:/gal";
     }
-
 
     @GetMapping("/adminDeleteUser")
     public String deleteUser(Model model, @AuthenticationPrincipal UserDetails userDetails, @RequestParam(value = "id", defaultValue = "-1") int id, RedirectAttributes redirectAttributes){
@@ -632,8 +656,8 @@ public class AdminController {
         }
 
         controllerUtilities.prepareBaseModel(model, role, username);
-        model.addAttribute("user", user);
-        return "adminDeleteUser";
+        model.addAttribute("userByAdmin", user);
+        return "deleteTemplate";
     }
 
     @PostMapping("/adminDeleteUser")
@@ -654,5 +678,5 @@ public class AdminController {
         return "redirect:/gal";
     }
 
-    //TODO: User account on user side and password recovery, merge the edit, delete, and view pages as much as possible, CSS responsive design
+    //TODO: password recovery, merge the view pages as much as possible, CSS responsive design
 }

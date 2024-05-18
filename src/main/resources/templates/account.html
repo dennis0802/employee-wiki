@@ -4,7 +4,7 @@
         <meta charset="utf-8" />
         <link rel="stylesheet" media="all" th:href="@{/styles.css}">
         <link rel="icon" type="image/x-icon" th:href="@{/img/favicon.ico}">
-        <title>Log Out</title>
+        <title>Your Account</title>
     </head>
 
     <body>
@@ -30,13 +30,32 @@
 
         <div id="page">
             <div style="text-align: center;">
-                <p><b>Are you sure you want to log out?</b></p>
+                <h1>Your Account</h1>
+                <p style="color:green" th:if="${!#strings.isEmpty(success)}" th:text="${success}"></p>
+                <p>Welcome to your account, <span th:text="${username}"></span>!</p>
+                <p>
+                    You may view and manage your account information or select to logout on this page.
+                    On the user-side, you can edit your password, alternative email, phone number, work location.
+                    If you require more advanced changes (such as username, job title), please contact your IT administrator.
+                </p>
+                <hr/>
 
-                <a href="/yourAccount"><button class="button buttonTheme">Return to Account</button></a><br/><br/>
+                <h2>Your Information</h2>
+                <p>Full Name: <span th:text="${user.firstName}"></span> <span th:text="${user.lastName}"></span></p>
+                <p>Email: <span th:text="${user.email}"></span></p>
+                <p>Alternate Email: <span th:text="${user.alternateEmail}"></span></p>
+                <p>Phone Number: <span th:text="${user.phoneNum}"></span></p>
+                <p>Job Title: <span th:text="${user.jobTitle}"></span></p>
+                <p>Work Location: <span th:text="${user.workLocation}"></span></p>
+                <p>Join Date: <span th:text="${user.joinDate}"></span></p>
+                <p>Manager: <span th:text="${user.managedBy}"></span></p>
+                <p>You have <span th:text="${user.entitledDays}"></span> days of time-off remaining.</p>
+                <hr/>
 
-                <form th:action="@{/logout}" method="post">
-                    <input type="submit" value="Sign Out"/>
-                </form>
+                <h2>Options</h2>
+                <a th:href="@{'/editAccount?id=' + ${user.id}}" ><button class="button buttonTheme">Edit Account</button></a><br/>
+                <a href="/logout"><button class="button buttonTheme">Logout</button></a><br/>
+
             </div>
             <br/><br/>
         </div>

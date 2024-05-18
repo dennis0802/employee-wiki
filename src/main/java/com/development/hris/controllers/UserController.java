@@ -16,6 +16,8 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import java.util.regex.Pattern;
+import java.util.regex.Matcher;
 import java.util.stream.Collectors;
 
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -42,8 +44,6 @@ public class UserController {
     @GetMapping({"/", "/index"})
     public String getIndex(Model model, @AuthenticationPrincipal UserDetails userDetails){
         String username = userDetails == null ? "" : userDetails.getUsername(), role = controllerUtilities.getRole(username);
-
-        // TODO: Check for root user and create if not present.
 
         List<News> news = userService.getAllNews();
         Collections.sort(news, new NewsComparator());
@@ -208,7 +208,7 @@ public class UserController {
 	}
 
     // View my pay
-    @GetMapping("viewMyPay")
+    @GetMapping("/viewMyPay")
     public String viewMyPay(@AuthenticationPrincipal UserDetails userDetails, Model model, @RequestParam Map<String, String> params){
         String username = userDetails.getUsername(), role = controllerUtilities.getRole(username), searchTerm = params.get("search") != null ? params.get("search") : "";
 
@@ -242,7 +242,7 @@ public class UserController {
         controllerUtilities.prepareBaseModel(model, role, username);
         controllerUtilities.preparePagingModel(model, null, null, nextPage, prevPage, searchTerm, user.getPay().size(), myPayData.size(), totalPages, page);
         controllerUtilities.prepareModelForEntities(model, "statements", toDisplay, false, null, null);
-        return "viewMyPay";
+        return "viewTemplate";
     }
 
     // View and make requests
@@ -296,7 +296,7 @@ public class UserController {
         controllerUtilities.prepareModelForEntities(model, "requests", toDisplay, true, "newRequest", new TimeOffRequest(null, null, null));
         model.addAttribute("user", user);
         model.addAttribute("myUsers", managedUsers);
-        return "viewMyRequests";
+        return "viewTemplate";
     }
 
     @PostMapping("/newRequest")
@@ -361,7 +361,7 @@ public class UserController {
         model.addAttribute("success", passedSuccess);
         model.addAttribute("editRequest", specifiedRequest);
         model.addAttribute("entitledDays", userService.findByUsername(username).getEntitledDays());
-        return "editMyRequest";
+        return "editTemplate";
     }
 
     @PostMapping("/editRequest")
@@ -507,8 +507,124 @@ public class UserController {
         controllerUtilities.prepareBaseModel(model, role, username);
         controllerUtilities.preparePagingModel(model, null, null, nextPage, prevPage, searchTerm, userService.getAllNews().size(), news.size(), totalPages, page);
         controllerUtilities.prepareModelForEntities(model, "news", toDisplay, false, null, null);
-        return "viewNews";
+        return "viewTemplate";
     }
+
+    // ACCOUNT
+    @GetMapping("/yourAccount")
+    public String getAccount(Model model, @AuthenticationPrincipal UserDetails userDetails){
+        String username = userDetails == null ? "" : userDetails.getUsername(), role = controllerUtilities.getRole(username);
+        String passedSuccess = "";
+
+        Object success= model.asMap().get("success");
+        if(success != null){
+            passedSuccess = success.toString();
+        }
+ 
+        controllerUtilities.prepareBaseModel(model, role, username);
+        model.addAttribute("user", userService.findByUsername(username));
+        model.addAttribute("success", passedSuccess);
+        return "account";
+    }
+
+    @GetMapping("/editAccount")
+    public String editUser(Model model, @AuthenticationPrincipal UserDetails userDetails, @RequestParam(value = "id", defaultValue = "-1") int id, RedirectAttributes redirectAttributes){
+        String username = userDetails == null ? "" : userDetails.getUsername(), role = controllerUtilities.getRole(username);
+
+        if(id == -1){
+            return "redirect:/index";
+        }
+        
+        SiteUser siteUser = userService.findUserById(id);
+        if(siteUser == null){
+            return "redirect:/index";
+        }
+
+        // Check for failure to display
+		Object errors = model.asMap().get("errors");
+		List<String> passedErrors = new ArrayList<String>();
+
+        if(errors != null){
+            passedErrors = ((ArrayList<String>)errors);
+        }
+
+        controllerUtilities.prepareBaseModel(model, role, username);
+        model.addAttribute("errors", passedErrors);
+        model.addAttribute("user", siteUser);
+        return "editTemplate";
+    }
+
+    @PostMapping("/editAccount")
+    public String editUserSubmitted(@ModelAttribute SiteUser user, @RequestParam("password") String password, RedirectAttributes redirectAttributes, 
+                                    @AuthenticationPrincipal UserDetails userDetails, @RequestParam(value = "id", defaultValue = "-1") int id){
+        if(id == -1){
+            return "redirect:/index";
+        }
+
+        SiteUser specified = userService.findUserById(id);
+        Pattern pattern;
+        Matcher matcher;
+
+        if(specified == null){
+            return "redirect:/index";
+        }
+
+        List<String> errors = new ArrayList<String>();
+        boolean passwordChanged = false;
+        if(!password.isBlank()){
+            // A valid password has at least 12 characters, containing 1 digit, 1 lowercase character, 1 uppercase character, and 1 special character
+            pattern = Pattern.compile("^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d)(?=.*[@$!%*?&])[A-Za-z\\d@$!%*?&]{12,}$");
+            matcher = pattern.matcher(password);
+
+            if(!matcher.matches()){
+                errors.add("ERROR: The password is invalid. A valid password has at least 12 characters, containing 1 digit, 1 lowercase character, 1 uppercase character, and 1 special character.");
+            }
+            else{
+                passwordChanged = true;
+            }
+        }
+
+        // Email
+        if(!user.getAlternateEmail().isBlank()){
+            pattern = Pattern.compile("^[A-Z0-9._%+-]+@[A-Z0-9.-]+\\.[A-Z]{2,6}$", Pattern.CASE_INSENSITIVE);
+            matcher = pattern.matcher(user.getAlternateEmail());
+            if(!matcher.matches()){
+                errors.add("The email address is invalid.");
+            }
+    
+            if(userService.findByEmail(user.getAlternateEmail()) != null  && !specified.getAlternateEmail().equals(user.getAlternateEmail())){
+                errors.add("The email address must be unique.");
+            }
+        }
+
+        if(!user.getPhoneNum().isBlank()){
+            pattern = Pattern.compile("^[0-9]{3}-[0-9]{3}-[0-9]{4}$|^$");
+            matcher = pattern.matcher(user.getPhoneNum());
+            
+            if(!matcher.matches()){
+                errors.add("ERROR: The phone number is invalid, format it as ###-###-####.");
+            }
+        }
+
+        if(errors.size() > 0){
+            redirectAttributes.addFlashAttribute("errors", errors);
+            return "redirect:/editAccount?id=" + id;
+        }
+
+        if(passwordChanged){
+            BCryptPasswordEncoder encoder = new BCryptPasswordEncoder();
+            specified.setPassword(encoder.encode(password));
+        }
+
+        specified.setAlternateEmail(user.getAlternateEmail());
+        specified.setPhoneNum(user.getPhoneNum());
+        specified.setWorkLocation(user.getWorkLocation());
+        userService.saveUser(specified);
+
+        log.info("User " + specified.getUsername() + " has edited their account.");
+        redirectAttributes.addFlashAttribute("success", "Account edited!");
+        return "redirect:/yourAccount";
+    }  
 
     @GetMapping("/test")
     public String test(){
