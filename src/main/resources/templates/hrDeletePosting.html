@@ -11,7 +11,8 @@
         <header>
             <div>
                 <a href="/index">
-                    <img th:src="@{/img/defaultLogo.png}" alt="Default HRIS logo" width="108px" height="60px"/>
+                    <img th:if="${!#strings.isEmpty(logo)}" th:src="@{'/img/' + ${logo}}" alt="HRIS logo" width="108px" height="60px"/>
+                    <img th:unless="${!#strings.isEmpty(logo)}" th:src="@{/img/defaultLogo.png}" alt="HRIS logo" width="108px" height="60px"/>
                 </a>
             </div>
             <div class="scrollmenu">

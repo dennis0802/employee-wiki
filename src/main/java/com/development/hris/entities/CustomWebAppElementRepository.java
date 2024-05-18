@@ -11,4 +11,11 @@ public interface CustomWebAppElementRepository extends JpaRepository<CustomWebAp
      * @return The element with id, null otherwise
      */
     CustomWebAppElement findById(long id);
+
+    /**
+     * Find an element by its description
+     * @param description The description of the element
+     * @return The element with that description, null otherwise.
+     */
+    CustomWebAppElement findByDescription(String description);
 }

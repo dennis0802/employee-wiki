@@ -3,7 +3,6 @@ package com.development.hris.entities;
 import org.hibernate.annotations.NaturalId;
 
 import java.util.ArrayList;
-import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 
@@ -20,7 +19,7 @@ import lombok.Setter;
 
 @Entity
 @Getter @Setter @NoArgsConstructor @AllArgsConstructor
-public class SiteUser implements Comparable<SiteUser>{
+public class SiteUser {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -52,7 +51,7 @@ public class SiteUser implements Comparable<SiteUser>{
     private List<TimeOffRequest> timeOff = new ArrayList<TimeOffRequest>();
 
     public SiteUser(String username, String password, String email, String alternateEmail, String role, String phoneNum, String workLocation, String firstName, 
-                    String lastName, String jobTitle, int entitledDays){
+                    String lastName, String jobTitle, int entitledDays, String managedBy, Date joinDate){
         this.username = username;
         this.password = password;
         this.firstName = firstName;
@@ -64,11 +63,7 @@ public class SiteUser implements Comparable<SiteUser>{
         this.jobTitle = jobTitle;
         this.workLocation = workLocation;
         this.entitledDays = entitledDays;
-        this.joinDate = Calendar.getInstance().getTime();
-    }
-
-    @Override
-    public int compareTo(SiteUser other) {
-        return Integer.compare(this.id.intValue(), other.getId().intValue());
+        this.managedBy = managedBy;
+        this.joinDate = joinDate;
     }
 }

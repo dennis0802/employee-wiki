@@ -25,9 +25,12 @@ public interface IUserService {
      * @param lastName User's last name
      * @param jobTitle User's job title
      * @param entitledDays User's entitled days off
+     * @param managedBy Who this user is managed by
+     * @param joinDate When the user joined
+     * @return The added user
      */
-    public void addUser(String username, String password, String email, String altEmail, String role, String phoneNum, String workLocation, String firstName, String lastName, 
-                        String jobTitle, int entitledDays);
+    public SiteUser addUser(String username, String password, String email, String altEmail, String role, String phoneNum, String workLocation, String firstName, String lastName, 
+                        String jobTitle, int entitledDays, String managedBy, Date joinDate);
 
     /**
      * Find a user by username

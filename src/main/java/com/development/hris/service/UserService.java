@@ -6,6 +6,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.stream.Collectors;
+import java.util.Calendar;
 
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -24,13 +25,14 @@ public class UserService implements IUserService{
     private final WhistleInfoRepository whistleInfoRepository;
     private final CustomWebAppElementRepository customWebAppElementRepository;
     private final OpenJobRepository openJobRepository;
+    //private final ControllerUtilities controllerUtilities;
 
-    public void addUser(String username, String password, String email, String altEmail, String role, String phoneNum, String workLocation, String firstName, String lastName, 
-                        String jobTitle, int entitledDays){
+    public SiteUser addUser(String username, String password, String email, String altEmail, String role, String phoneNum, String workLocation, String firstName, String lastName, 
+                        String jobTitle, int entitledDays, String managedBy, Date joinDate){
         BCryptPasswordEncoder encoder = new BCryptPasswordEncoder();
-        SiteUser user = new SiteUser(username, encoder.encode(password), email, altEmail, role, phoneNum, workLocation, firstName, lastName, jobTitle, entitledDays);
-        user.setEnabled(true);
-        userRepository.save(user);
+        SiteUser user = new SiteUser(username, encoder.encode(password), email, altEmail, role, phoneNum, workLocation, firstName, lastName, jobTitle, entitledDays, managedBy, joinDate);
+        user.setEnabled(false);
+        return userRepository.save(user);
     }
 
     public SiteUser findByUsername(String username){
@@ -40,14 +42,27 @@ public class UserService implements IUserService{
         return null;
     }
 
-    public void toggleUser(String username, boolean isArchiving){
+    public SiteUser findByEmail(String email){
+        if(userRepository.findByEmail(email).isPresent()){
+            return userRepository.findByEmail(email).get();
+        }
+        return null;
+    }
+
+    public SiteUser findUserById(long id){
+        return userRepository.findById(id);
+    }
+
+    public void toggleUser(String username, boolean isEnabled){
         SiteUser user = findByUsername(username);
-        if(user != null && isArchiving){
+        if(user != null && isEnabled){
             user.setEnabled(false);
         }
-        else if(user != null && !isArchiving){
+        else if(user != null && !isEnabled){
             user.setEnabled(true);
         }
+
+        userRepository.save(user);
     }
 
     public void deleteUser(String username){
@@ -67,6 +82,14 @@ public class UserService implements IUserService{
                 for(PayrollData yourPay : pay){
                     user.getPay().remove(yourPay);
                     payrollDataRepository.delete(yourPay);
+                }
+            }
+
+            List<TimeOffRequest> timeOffRequests = new ArrayList<TimeOffRequest>(user.getTimeOff());
+            if(timeOffRequests.size() > 0){
+                for (TimeOffRequest yourRequest : timeOffRequests) {
+                    user.getTimeOff().remove(yourRequest);
+                    timeOffRequestRepository.delete(yourRequest);
                 }
             }
 
@@ -98,6 +121,25 @@ public class UserService implements IUserService{
     public void addSupervisedEmployee(SiteUser employee, SiteUser supervisor){
         employee.setManagedBy(supervisor.getUsername());
         userRepository.save(employee);
+    }
+
+    public void saveUser(SiteUser user){
+        userRepository.save(user);
+    }
+
+    public void resetPassword(String username){
+        SiteUser user = userRepository.findByUsername(username).isPresent() ? userRepository.findByUsername(username).get() : null;
+        BCryptPasswordEncoder encoder = new BCryptPasswordEncoder();
+
+        if(user == null){
+            return;
+        }
+
+        Calendar calendar = Calendar.getInstance();
+        calendar.setTime(new Date());
+        String pass = "EmployeeWiki" + calendar.get(Calendar.YEAR) + "!";
+        user.setPassword(encoder.encode(pass));
+        userRepository.save(user);
     }
     
     // PAY
@@ -237,7 +279,24 @@ public class UserService implements IUserService{
         openJobRepository.deleteById(id);
     }
 
-    // JOB APPLICATIONS
-
     // WEB ELEMENTS
+    public CustomWebAppElement getElementByDescription(String description){
+        return customWebAppElementRepository.findByDescription(description);
+    }
+
+    public List<CustomWebAppElement> getAllElements(){
+        return customWebAppElementRepository.findAll();
+    }
+
+    public CustomWebAppElement getElementById(long id){
+        return customWebAppElementRepository.findById(id);
+    }
+
+    public CustomWebAppElement addOrEditElement(CustomWebAppElement element){
+        return customWebAppElementRepository.save(element);
+    }
+
+    public void deleteElement(long id){
+        customWebAppElementRepository.deleteById(id);
+    }
 }

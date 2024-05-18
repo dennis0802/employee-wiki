@@ -4,14 +4,16 @@
         <meta charset="utf-8" />
         <link rel="stylesheet" media="all" th:href="@{/styles.css}">
         <link rel="icon" type="image/x-icon" th:href="@{/img/favicon.ico}">
-        <title>Employee Wiki</title>
+        <title th:if="${!#strings.isEmpty(company)}" th:text="${company + '- Employee Wiki'}"></title>
+        <title th:unless="${!#strings.isEmpty(company)}">Employee Wiki</title>
     </head>
 
     <body>
         <header>
             <div>
                 <a href="/index">
-                    <img th:src="@{/img/defaultLogo.png}" alt="Default HRIS logo" width="108px" height="60px"/>
+                    <img th:if="${!#strings.isEmpty(logo)}" th:src="@{'/img/' + ${logo}}" alt="HRIS logo" width="108px" height="60px"/>
+                    <img th:unless="${!#strings.isEmpty(logo)}" th:src="@{/img/defaultLogo.png}" alt="HRIS logo" width="108px" height="60px"/>
                 </a>
             </div>
             <div class="scrollmenu">
@@ -24,17 +26,18 @@
                 <a href="/calendar" th:if="${!#strings.isEmpty(username)}"><b>Calendar</b></a>
                 <a href="/resources" th:if="${!#strings.isEmpty(username)}"><b>Resources</b></a>
                 <a href="/hrMenu" th:if="${!#strings.isEmpty(username) and (#strings.equals(role, 'ADMIN') or #strings.equals(#strings.substring(role, 0, 2), 'HR'))}"><b>HR/Payroll Menu</b></a>
-                <a href="/adminMenu" th:if="${!#strings.isEmpty(username) and (#strings.equals(role, 'ADMIN'))}"><b>Admin Commands</b></a>
+                <a href="/yourAccount" th:if="${!#strings.isEmpty(username)}"><b>Your Account</b></a>
                 <a href="/logout" th:if="${!#strings.isEmpty(username)}"><b>Logout</b></a>
             </div>
         </header>
 
         <div id="page">
             <div style="text-align: center;">
-                <h1>Employee Wiki</h1>
+                <h1 th:if="${!#strings.isEmpty(company)}"><span th:text="${company}"></span> Employee Wiki</h1>
+                <h1 th:unless="${!#strings.isEmpty(company)}">Employee Wiki</h1>
                 <img id="landingImg" th:src="@{/img/hris.jpg}" alt="Default HRIS image" />
                 <p>
-                    Welcome to Employee Wiki, the wikipedia and employee platform for all your employee experience needs. Here, you can view company information,
+                    Welcome to Employee Wiki, the wikipedia and employee platform for all your employee experience needs. Here, you can view your company information,
                     make time-off requests, and view your payroll information.
                 </p>
 
@@ -74,6 +77,8 @@
                                 if you need help logging in.
                             </b>
                         </p>
+
+                        <a href="/forgotPassword">If you have forgotten your password, click here to go through the reset process!</a>
 
                         <p>
                             <a href="/candidateHome">

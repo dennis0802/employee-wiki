@@ -58,22 +58,15 @@ public class HrController {
 
     @GetMapping("/hrMenu")
     public String hrMenu(Model model, @AuthenticationPrincipal UserDetails userDetails){
-        String username = userDetails == null ? "" : userDetails.getUsername();
-        String role = controllerUtilities.getRole(username);
+        String username = userDetails == null ? "" : userDetails.getUsername(), role = controllerUtilities.getRole(username);
         
-        model.addAttribute("role", role);
-        model.addAttribute("username", username);
-        model.addAttribute("year", controllerUtilities.getYear());
-        model.addAttribute("company", "TempCompany");
+        controllerUtilities.prepareBaseModel(model, role, username);
         return "hrMenu";
     }
 
     @GetMapping("/hrViewPayroll")
     public String hrViewPayroll(Model model, @AuthenticationPrincipal UserDetails userDetails, @RequestParam Map<String, String> params){
-        String username = userDetails == null ? "" : userDetails.getUsername();
-        String role = controllerUtilities.getRole(username);
-
-        String searchTerm = params.get("search") != null ? params.get("search") : "";
+        String username = userDetails == null ? "" : userDetails.getUsername(), role = controllerUtilities.getRole(username), searchTerm = params.get("search") != null ? params.get("search") : "";
         int page = params.get("page") != null ? Integer.parseInt(params.get("page")) : 1;
         int min = 0 + (page-1) * (int)ControllerUtilities.VIEW_PER_PAGE, max = ((int)ControllerUtilities.VIEW_PER_PAGE-1) + (page-1) * 25;
         
@@ -103,7 +96,7 @@ public class HrController {
                 toDisplay.add(allPayroll.get(i));
             }
         }
-        catch(Exception e){}
+        catch(Exception e){/* Less than max per page */}
 
         Object errors = model.asMap().get("errors");
         Object success= model.asMap().get("success");
@@ -117,22 +110,9 @@ public class HrController {
             passedSuccess = success.toString();
         }
 
-        model.addAttribute("role", role);
-        model.addAttribute("username", username);
-        model.addAttribute("year", controllerUtilities.getYear());
-        model.addAttribute("statements", allPayroll);
-        model.addAttribute("company", "TempCompany");
-        model.addAttribute("users", allUsers);
-        model.addAttribute("errors", passedErrors);
-        model.addAttribute("success", passedSuccess);
-        model.addAttribute("statementNew", new PayrollData());
-        model.addAttribute("nextPage", nextPage);
-		model.addAttribute("prevPage", prevPage);
-        model.addAttribute("searched", searchTerm);
-        model.addAttribute("baseCount", userService.getAllPayData().size());
-        model.addAttribute("totalCount", allPayroll.size());
-		model.addAttribute("totalPages", totalPages);
-		model.addAttribute("currentPage", page);
+        controllerUtilities.prepareBaseModel(model, role, username);
+        controllerUtilities.preparePagingModel(model, passedErrors, passedSuccess, nextPage, prevPage, searchTerm, userService.getAllPayData().size(), allPayroll.size(), totalPages, page);
+        controllerUtilities.prepareModelForEntities(model, "statements", toDisplay, true, "statementNew", new PayrollData());
         return "hrViewPayroll";
     }
 
@@ -206,16 +186,13 @@ public class HrController {
 
         redirectAttributes.addFlashAttribute("success", "Pay statement added!");
         long id = userService.addPay(statementNew, user);
-        
-        
         log.info(userDetails.getUsername() + " added pay statement id#" + id);
         return "redirect:/hrViewPayroll";
     }
 
     @GetMapping("/hrEditPayroll")
     public String hrEditPayroll(Model model, @AuthenticationPrincipal UserDetails userDetails, @RequestParam(value = "id", defaultValue = "-1") int id, RedirectAttributes redirectAttributes){
-        String username = userDetails == null ? "" : userDetails.getUsername();
-        String role = controllerUtilities.getRole(username);
+        String username = userDetails == null ? "" : userDetails.getUsername(), role = controllerUtilities.getRole(username);
 
         if(id == -1){
             List<String> errors = new ArrayList<String>();
@@ -240,10 +217,7 @@ public class HrController {
             passedErrors = ((ArrayList<String>)errors);
         }
 
-        model.addAttribute("role", role);
-        model.addAttribute("username", username);
-        model.addAttribute("year", controllerUtilities.getYear());
-        model.addAttribute("company", "TempCompany");
+        controllerUtilities.prepareBaseModel(model, role, username);
         model.addAttribute("errors", passedErrors);
         model.addAttribute("payroll", data);
         model.addAttribute("users", userService.getAllUsers());
@@ -341,8 +315,7 @@ public class HrController {
 
     @GetMapping("/hrDeletePayroll")
     public String hrDeletePayroll(Model model, @AuthenticationPrincipal UserDetails userDetails, @RequestParam(value = "id", defaultValue = "-1") int id, RedirectAttributes redirectAttributes){
-        String username = userDetails == null ? "" : userDetails.getUsername();
-        String role = controllerUtilities.getRole(username);
+        String username = userDetails == null ? "" : userDetails.getUsername(), role = controllerUtilities.getRole(username);
         
         if(id == -1){
             List<String> errors = new ArrayList<String>();
@@ -360,10 +333,7 @@ public class HrController {
             return "redirect:/hrViewPayroll";
         }
 
-        model.addAttribute("role", role);
-        model.addAttribute("username", username);
-        model.addAttribute("year", controllerUtilities.getYear());
-        model.addAttribute("company", "TempCompany");
+        controllerUtilities.prepareBaseModel(model, role, username);
         model.addAttribute("payroll", data);
         return "hrDeletePayroll";
     }
@@ -387,8 +357,7 @@ public class HrController {
 
     @GetMapping("/hrViewRequests")
     public String hrViewRequest(Model model, @AuthenticationPrincipal UserDetails userDetails, @RequestParam Map<String, String> params){
-        String username = userDetails == null ? "" : userDetails.getUsername();
-        String role = controllerUtilities.getRole(username);
+        String username = userDetails == null ? "" : userDetails.getUsername(), role = controllerUtilities.getRole(username);
 
         String searchTerm = params.get("search") != null ? params.get("search") : "";
         int page = params.get("page") != null ? Integer.parseInt(params.get("page")) : 1;
@@ -415,21 +384,11 @@ public class HrController {
                 toDisplay.add(allUsers.get(i));
             }
         }
-        catch(Exception e){}
+        catch(Exception e){/* Less than max per page */}
         
-        model.addAttribute("role", role);
-        model.addAttribute("username", username);
-        model.addAttribute("year", controllerUtilities.getYear());
-        model.addAttribute("company", "TempCompany");
-        model.addAttribute("myUsers", toDisplay);
-        model.addAttribute("nextPage", nextPage);
-		model.addAttribute("prevPage", prevPage);
-        model.addAttribute("searched", searchTerm);
-        model.addAttribute("baseCount", userService.getAllUsers().size());
-        model.addAttribute("totalCount", allUsers.size());
-		model.addAttribute("totalPages", totalPages);
-		model.addAttribute("currentPage", page);
-
+        controllerUtilities.prepareBaseModel(model, role, username);
+        controllerUtilities.preparePagingModel(model, null, null, nextPage, prevPage, searchTerm, userService.getAllUsers().size(), allUsers.size(), totalPages, page);
+        controllerUtilities.prepareModelForEntities(model, "myUsers", toDisplay, false, null, null);
         return "hrViewRequest";
     }
 
@@ -482,8 +441,7 @@ public class HrController {
 
     @GetMapping("/hrViewNews")
     public String hrViewNews(Model model, @AuthenticationPrincipal UserDetails userDetails, @RequestParam Map<String, String> params){
-        String username = userDetails == null ? "" : userDetails.getUsername();
-        String role = controllerUtilities.getRole(username);
+        String username = userDetails == null ? "" : userDetails.getUsername(), role = controllerUtilities.getRole(username);
 
         String searchTerm = params.get("search") != null ? params.get("search") : "";
         int page = params.get("page") != null ? Integer.parseInt(params.get("page")) : 1;
@@ -512,7 +470,7 @@ public class HrController {
                 toDisplay.add(allNews.get(i));
             }
         }
-        catch(Exception e){}
+        catch(Exception e){/* Less than max per page */}
 
         Object errors = model.asMap().get("errors");
         Object success= model.asMap().get("success");
@@ -526,21 +484,9 @@ public class HrController {
             passedSuccess = success.toString();
         }
 
-        model.addAttribute("role", role);
-        model.addAttribute("username", username);
-        model.addAttribute("year", controllerUtilities.getYear());
-        model.addAttribute("news", toDisplay);
-        model.addAttribute("company", "TempCompany");
-        model.addAttribute("newArticle", new News());
-        model.addAttribute("errors", passedErrors);
-        model.addAttribute("success", passedSuccess);
-        model.addAttribute("nextPage", nextPage);
-		model.addAttribute("prevPage", prevPage);
-        model.addAttribute("searched", searchTerm);
-        model.addAttribute("baseCount", userService.getAllNews().size());
-        model.addAttribute("totalCount", allNews.size());
-		model.addAttribute("totalPages", totalPages);
-		model.addAttribute("currentPage", page);
+        controllerUtilities.prepareBaseModel(model, role, username);
+        controllerUtilities.preparePagingModel(model, passedErrors, passedSuccess, nextPage, prevPage, searchTerm, userService.getAllNews().size(), allNews.size(), totalPages, page);
+        controllerUtilities.prepareModelForEntities(model, "news", toDisplay, true, "newArticle", new News());
         return "hrViewNews";
     }
 
@@ -600,8 +546,7 @@ public class HrController {
 
     @GetMapping("/hrEditNews")
     public String editNews(Model model, @AuthenticationPrincipal UserDetails userDetails, @RequestParam(value = "id", defaultValue = "-1") int id, RedirectAttributes redirectAttributes){
-        String username = userDetails == null ? "" : userDetails.getUsername();
-        String role = controllerUtilities.getRole(username);
+        String username = userDetails == null ? "" : userDetails.getUsername(), role = controllerUtilities.getRole(username);
 
         if(id == -1){
             List<String> errors = new ArrayList<String>();
@@ -626,10 +571,7 @@ public class HrController {
             passedErrors = ((ArrayList<String>)errors);
         }
 
-        model.addAttribute("role", role);
-        model.addAttribute("username", username);
-        model.addAttribute("year", controllerUtilities.getYear());
-        model.addAttribute("company", "TempCompany");
+        controllerUtilities.prepareBaseModel(model, role, username);
         model.addAttribute("errors", passedErrors);
         model.addAttribute("article", data);
         return "hrEditNews";
@@ -698,8 +640,7 @@ public class HrController {
 
     @GetMapping("/hrDeleteNews")
     public String hrDeleteNews(Model model, @AuthenticationPrincipal UserDetails userDetails, @RequestParam(value = "id", defaultValue = "-1") int id, RedirectAttributes redirectAttributes){
-        String username = userDetails == null ? "" : userDetails.getUsername();
-        String role = controllerUtilities.getRole(username);
+        String username = userDetails == null ? "" : userDetails.getUsername(), role = controllerUtilities.getRole(username);
         List<String> errors = new ArrayList<String>();
         
         if(id == -1){
@@ -716,10 +657,7 @@ public class HrController {
             return "redirect:/hrViewNews";
         }
 
-        model.addAttribute("role", role);
-        model.addAttribute("username", username);
-        model.addAttribute("year", controllerUtilities.getYear());
-        model.addAttribute("company", "TempCompany");
+        controllerUtilities.prepareBaseModel(model, role, username);
         model.addAttribute("article", article);
         return "hrDeleteNews";
     }
@@ -742,8 +680,7 @@ public class HrController {
 
     @GetMapping("/hrViewWhistleblower")
     public String viewWhistleblowerBox(Model model, @AuthenticationPrincipal UserDetails userDetails, @RequestParam Map<String, String> params){
-        String username = userDetails == null ? "" : userDetails.getUsername();
-        String role = controllerUtilities.getRole(username);
+        String username = userDetails == null ? "" : userDetails.getUsername(), role = controllerUtilities.getRole(username);
 
         String searchTerm = params.get("search") != null ? params.get("search") : "";
         int page = params.get("page") != null ? Integer.parseInt(params.get("page")) : 1;
@@ -770,27 +707,17 @@ public class HrController {
                 toDisplay.add(allSubmissions.get(i));
             }
         }
-        catch(Exception e){}
+        catch(Exception e){/* Less than max per page */}
 
-        model.addAttribute("role", role);
-        model.addAttribute("username", username);
-        model.addAttribute("year", controllerUtilities.getYear());
-        model.addAttribute("company", "TempCompany");
-        model.addAttribute("submissions", toDisplay);
-        model.addAttribute("nextPage", nextPage);
-		model.addAttribute("prevPage", prevPage);
-        model.addAttribute("searched", searchTerm);
-        model.addAttribute("baseCount", userService.getAllSubmissions().size());
-        model.addAttribute("totalCount", allSubmissions.size());
-		model.addAttribute("totalPages", totalPages);
-		model.addAttribute("currentPage", page);
+        controllerUtilities.prepareBaseModel(model, role, username);
+        controllerUtilities.preparePagingModel(model, null, null, nextPage, prevPage, searchTerm, userService.getAllSubmissions().size(), allSubmissions.size(), totalPages, page);
+        controllerUtilities.prepareModelForEntities(model, "submissions", toDisplay, false, null, null);
         return "hrViewWhistleInfo";
     }
 
     @GetMapping("/hrViewJobs")
     public String hrViewJobs(Model model, @AuthenticationPrincipal UserDetails userDetails, @RequestParam Map<String, String> params){
-        String username = userDetails == null ? "" : userDetails.getUsername();
-        String role = controllerUtilities.getRole(username);
+        String username = userDetails == null ? "" : userDetails.getUsername(), role = controllerUtilities.getRole(username);
 
         String searchTerm = params.get("search") != null ? params.get("search") : "";
         int page = params.get("page") != null ? Integer.parseInt(params.get("page")) : 1;
@@ -817,7 +744,7 @@ public class HrController {
                 toDisplay.add(allJobs.get(i));
             }
         }
-        catch(Exception e){}
+        catch(Exception e){/* Less than max per page */}
 
         Object errors = model.asMap().get("errors");
         Object success= model.asMap().get("success");
@@ -831,21 +758,9 @@ public class HrController {
             passedSuccess = success.toString();
         }
 
-        model.addAttribute("role", role);
-        model.addAttribute("username", username);
-        model.addAttribute("year", controllerUtilities.getYear());
-        model.addAttribute("company", "TempCompany");
-        model.addAttribute("postings", toDisplay);
-        model.addAttribute("errors", passedErrors);
-        model.addAttribute("success", passedSuccess);
-        model.addAttribute("nextPage", nextPage);
-		model.addAttribute("prevPage", prevPage);
-        model.addAttribute("searched", searchTerm);
-        model.addAttribute("baseCount", userService.getAllJobs().size());
-        model.addAttribute("totalCount", allJobs.size());
-		model.addAttribute("totalPages", totalPages);
-		model.addAttribute("currentPage", page);
-        model.addAttribute("newPosting", new OpenJob(null, null, null, null, false));
+        controllerUtilities.prepareBaseModel(model, role, username);
+        controllerUtilities.preparePagingModel(model, passedErrors, passedSuccess, nextPage, prevPage, searchTerm, userService.getAllJobs().size(), allJobs.size(), totalPages, page);
+        controllerUtilities.prepareModelForEntities(model, "postings", toDisplay, true, "newPosting", new OpenJob(null, null, null, null, false));
         return "viewJobPostingList";
     }
 
@@ -910,8 +825,7 @@ public class HrController {
 
     @GetMapping("/hrEditPosting")
     public String getEditPosting(Model model, @AuthenticationPrincipal UserDetails userDetails, @RequestParam(value = "id", defaultValue = "-1") int id, RedirectAttributes redirectAttributes){
-        String username = userDetails == null ? "" : userDetails.getUsername();
-        String role = controllerUtilities.getRole(username);
+        String username = userDetails == null ? "" : userDetails.getUsername(), role = controllerUtilities.getRole(username);
 
         if(id == -1){
             List<String> errors = new ArrayList<String>();
@@ -936,10 +850,7 @@ public class HrController {
             passedErrors = ((ArrayList<String>)errors);
         }
 
-        model.addAttribute("role", role);
-        model.addAttribute("username", username);
-        model.addAttribute("year", controllerUtilities.getYear());
-        model.addAttribute("company", "TempCompany");
+        controllerUtilities.prepareBaseModel(model, role, username);
         model.addAttribute("errors", passedErrors);
         model.addAttribute("posting", openJob);
         return "hrEditPosting";
@@ -976,7 +887,7 @@ public class HrController {
 
         if(errors.size() > 0){
             redirectAttributes.addFlashAttribute("errors", errors);
-            return "redirect:/hrViewJobs";
+            return "redirect:/hrEditPosting?id=" + id;
         }
 
         String filePath = specifiedJob.getLink();
@@ -990,26 +901,23 @@ public class HrController {
             catch (FileAlreadyExistsException e){
                 errors.add("The file must not already exist.");
                 redirectAttributes.addFlashAttribute("errors", errors);
-                return "redirect:/hrViewJobs";
+                return "redirect:/hrEditPosting?id=" + id;
             }
             catch (Exception e) {
                 errors.add("Please contact your IT administrator, an error has occurred with the file name");
                 redirectAttributes.addFlashAttribute("errors", errors);
-                return "redirect:/hrViewJobs";
+                return "redirect:/hrEditPosting?id=" + id;
             }
 
             Path oldFilePath = Paths.get(POSTINGS_DIRECTORY, filePath);
             try {
                 Files.delete(oldFilePath);
             }
-            catch (java.nio.file.NoSuchFileException e) {
-                return "redirect:/hrViewJobs";
-            }
             catch (Exception e) {
+                log.info(e.toString());
                 return "redirect:/hrViewJobs";
             }
             log.info(filePath + " will be replaced with " + fileName.toString());
-            
             filePath = fileName.toString();
         }
 
@@ -1049,8 +957,7 @@ public class HrController {
 
     @GetMapping("/hrDeletePosting")
     public String hrDeleteJob(Model model, @AuthenticationPrincipal UserDetails userDetails, @RequestParam(value = "id", defaultValue = "-1") int id, RedirectAttributes redirectAttributes){
-        String username = userDetails == null ? "" : userDetails.getUsername();
-        String role = controllerUtilities.getRole(username);
+        String username = userDetails == null ? "" : userDetails.getUsername(), role = controllerUtilities.getRole(username);
         List<String> errors = new ArrayList<String>();
         
         if(id == -1){
@@ -1067,10 +974,7 @@ public class HrController {
             return "redirect:/hrViewJobs";
         }
 
-        model.addAttribute("role", role);
-        model.addAttribute("username", username);
-        model.addAttribute("year", controllerUtilities.getYear());
-        model.addAttribute("company", "TempCompany");
+        controllerUtilities.prepareBaseModel(model, role, username);
         model.addAttribute("posting", openJob);
         return "hrDeletePosting";
     }
@@ -1083,7 +987,7 @@ public class HrController {
 
         try {
             Files.delete(Paths.get(POSTINGS_DIRECTORY, userService.getJobById(id).getLink()));
-        } catch (Exception e) {}
+        } catch (Exception e) {/* File not found */}
         
         log.info(userDetails.getUsername() + " deleted posting id#" + id + ", for the " + userService.getJobById(id).getPosition() + " position");
         userService.deleteJob(id);

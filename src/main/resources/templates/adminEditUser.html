@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org" lang="en">
+    <head>
+        <meta charset="utf-8" />
+        <link rel="stylesheet" media="all" th:href="@{/styles.css}">
+        <link rel="icon" type="image/x-icon" th:href="@{/img/favicon.ico}">
+        <title>Edit User</title>
+    </head>
+
+    <body>
+        <header>
+            <div>
+                <a href="/index">
+                    <img th:if="${!#strings.isEmpty(logo)}" th:src="@{'/img/' + ${logo}}" alt="HRIS logo" width="108px" height="60px"/>
+                    <img th:unless="${!#strings.isEmpty(logo)}" th:src="@{/img/defaultLogo.png}" alt="HRIS logo" width="108px" height="60px"/>
+                </a>
+            </div>
+            <div class="scrollmenu">
+                <a href="/gal" th:if="${!#strings.isEmpty(username) and #strings.equals(role, 'ADMIN')}"><b>Back to GAL</b></a>
+            </div>
+        </header>
+
+        <div id="page">
+            <div style="text-align: center;">
+                <div th:if="${!#lists.isEmpty(errors)}">
+                    <p style="color:red;font-weight: bold;">ERRORS</p>
+                    <ul style="list-style-position: inside;padding-left: 0;">
+                        <li style="color:red" th:each="error : ${errors}" th:text="${error}"></li>
+                    </ul>
+                </div>
+                
+                <h2>Edit User</h2>
+                <a th:if="${#strings.equals(role, 'ADMIN')}" href="/gal"><button class="button buttonTheme">Return to GAL</button></a><br/>
+                <ul style="list-style-position: inside;">
+                    <li>Passwords cannot be edited here. If a user requires a password reset and they cannot use the recovery method, please use the Reset option on the previous page</li>
+                    <li>The users will specify their alternate email, phone number, and work location.</li>
+                    <li>Ensure a user has a username, first name, last name, job title, primary/work email, and role</li>
+                    <li>A manager is optional for the case of higher-level users</li>
+                    <li>Usernames should be formatted as <i>firstname.lastname</i></li>
+                    <li>Primary emails should be formatted as <i>firstname.lastname@domain</i></li>
+                    <li>If you do not want to change the manager or role, leave the fields as is</li>
+                    <li>NOTE: If you change your username, you must login again.</li>
+                </ul>
+
+                <form th:action="@{'/adminEditUser?id=' + ${user.id}}" method="post" th:object="${user}" enctype="multipart/form-data">
+                    <label for="username">*Username</label><br/>
+                    <input type="text" name="username" th:field="*{username}" /><br/><br/>
+
+                    <label for="firstName">*First Name</label><br/>
+                    <input type="text" name="firstName" th:field="*{firstName}" /><br/><br/>
+
+                    <label for="lastName">*Last Name</label><br/>
+                    <input type="text" name="lastName" th:field="*{lastName}" /><br/><br/>
+
+                    <label for="jobTitle">*Job Title</label><br/>
+                    <input type="text" name="jobTitle" th:field="*{jobTitle}" /><br/><br/>
+
+                    <label for="email">*Work Email</label><br/>
+                    <input type="text" name="email" th:field="*{email}" /><br/><br/>
+
+                    <label for="managedBy">Manager</label><br/>
+                    <select name="managedBy" id="managedBy">
+                        <option value="" selected="selected" hidden="hidden">Select a user...</option>
+                        <option th:each="user : ${allSiteUsers}" th:value="${user.username}" th:if="${!#strings.equals(username, user.username)}" th:text="${user.firstName} + ' ' + ${user.lastName}"></option>
+                    </select><br/><br/>
+
+                    <label for="role">*Role</label><br/>
+                    <select name="role" id="role">
+                        <option value="" selected="selected" hidden="hidden">Select a role...</option>
+                        <option value="USER">User</option>
+                        <option value="ADMIN">Admin</option>
+                        <option value="HR">HR</option>
+                        <option value="HR_PAYROLL">HR Payroll</option>
+                    </select><br/><br/>
+
+                    <input type="submit" value="Edit User"/>
+                </form>
+            </div>
+            <br/><br/>
+        </div>
+
+        <footer>
+            &copy; <span th:text="${year}"></span> <span th:text="${company}">, All rights reserved.</span> <br/>
+            Powered by Employee Wiki&trade; <br/>
+            <a href="#top">Back to Top</a>
+        </footer>
+    </body>
+</html>

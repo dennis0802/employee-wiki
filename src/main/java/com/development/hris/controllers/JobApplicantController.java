@@ -52,19 +52,12 @@ public class JobApplicantController {
                 toDisplay.add(allJobs.get(i));
             }
         }
-        catch(Exception e){}
+        catch(Exception e){/* Less than max per page */}
 
-        model.addAttribute("role", "NOT_APPLICABLE");
-        model.addAttribute("year", controllerUtilities.getYear());
-        model.addAttribute("company", "TempCompany");
-        model.addAttribute("postings", toDisplay);
-        model.addAttribute("nextPage", nextPage);
-		model.addAttribute("prevPage", prevPage);
-        model.addAttribute("searched", searchTerm);
-        model.addAttribute("baseCount", userService.getAllJobs().size());
-        model.addAttribute("totalCount", allJobs.size());
-		model.addAttribute("totalPages", totalPages);
-		model.addAttribute("currentPage", page);
+        controllerUtilities.prepareBaseModel(model, "NOT_APPLICABLE", null);
+        controllerUtilities.preparePagingModel(model, null, null, nextPage, prevPage, searchTerm, userService.getAllJobs().size(), allJobs.size(), totalPages, page);
+        controllerUtilities.prepareModelForEntities(model, "postings", toDisplay, false, null, null);
+        model.addAttribute("hrEmail", controllerUtilities.getHrEmail());
         return "viewJobPostingList";
     }
 }

@@ -20,6 +20,7 @@ import java.util.stream.Collectors;
 
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -40,8 +41,9 @@ public class UserController {
 
     @GetMapping({"/", "/index"})
     public String getIndex(Model model, @AuthenticationPrincipal UserDetails userDetails){
-        String username = userDetails == null ? "" : userDetails.getUsername();
-        String role = controllerUtilities.getRole(username);
+        String username = userDetails == null ? "" : userDetails.getUsername(), role = controllerUtilities.getRole(username);
+
+        // TODO: Check for root user and create if not present.
 
         List<News> news = userService.getAllNews();
         Collections.sort(news, new NewsComparator());
@@ -53,12 +55,9 @@ public class UserController {
                 toDisplay.add(news.get(i));
             }
         }
-        catch(Exception e){}
+        catch(Exception e){/* Less than max per page */}
  
-        model.addAttribute("role", role);
-        model.addAttribute("username", username);
-        model.addAttribute("year", controllerUtilities.getYear());
-        model.addAttribute("company", "TempCompany");
+        controllerUtilities.prepareBaseModel(model, role, username);
         model.addAttribute("news", toDisplay);
         return "index";
     }
@@ -66,51 +65,40 @@ public class UserController {
     // Org chart
     @GetMapping("/orgChart")
     public String getOrgChart(Model model, @AuthenticationPrincipal UserDetails userDetails){
-        String username = userDetails == null ? "" : userDetails.getUsername();
-        String role = controllerUtilities.getRole(username);
+        String username = userDetails == null ? "" : userDetails.getUsername(), role = controllerUtilities.getRole(username);
         
-        model.addAttribute("role", role);
-        model.addAttribute("username", username);
-        model.addAttribute("year", controllerUtilities.getYear());
-        model.addAttribute("company", "TempCompany");
-        model.addAttribute("orgChartPath", "/uploads/test.png");
+        controllerUtilities.prepareBaseModel(model, role, username);
+        model.addAttribute("orgChartPath", controllerUtilities.getOrgChartLocation());
         return "orgChart";
     }
 
     // Global Address List
     @GetMapping("/gal")
-    public String getGal(Model model, @AuthenticationPrincipal UserDetails userDetails){
-        String username = userDetails == null ? "" : userDetails.getUsername();
-        String role = controllerUtilities.getRole(username);
+    public String getGal(Model model, @AuthenticationPrincipal UserDetails userDetails, @RequestParam Map<String, String> params){
+        String username = userDetails == null ? "" : userDetails.getUsername(), role = controllerUtilities.getRole(username), searchTerm = params.get("search") != null ? params.get("search") : "";;
         List<SiteUser> allUsers = controllerUtilities.getSiteUsersOrderByLastName();
+
+        int page = params.get("page") != null ? Integer.parseInt(params.get("page")) : 1;
+        int min = 0 + (page-1) * (int)ControllerUtilities.VIEW_PER_PAGE, max = ((int)ControllerUtilities.VIEW_PER_PAGE-1) + (page-1) * 25;
         
-        model.addAttribute("role", role);
-        model.addAttribute("username", username);
-        model.addAttribute("year", controllerUtilities.getYear());
-        model.addAttribute("company", "TempCompany");
-        model.addAttribute("allUsers", allUsers);
-        return "gal";
-    }
-
-    // Calendar
-    // https://code.daypilot.org/58614/using-javascript-html5-monthly-calendar-in-spring-boot-java
-    @GetMapping("/calendar")
-    public String getCalendar(Model model, @AuthenticationPrincipal UserDetails userDetails, final HttpServletRequest request){
-        String username = userDetails == null ? "" : userDetails.getUsername();
-        String role = controllerUtilities.getRole(username);
-
-        model.addAttribute("role", role);
-        model.addAttribute("username", username);
-        model.addAttribute("year", controllerUtilities.getYear());
-        model.addAttribute("company", "TempCompany");
-        return "calendar";
-    }
-
-    // Resources and whistleblower
-    @GetMapping("/resources")
-    public String getResources(Model model, @AuthenticationPrincipal UserDetails userDetails){
-        String username = userDetails == null ? "" : userDetails.getUsername();
-        String role = controllerUtilities.getRole(username);
+        // Filter the data if a search term is provided
+        if(!searchTerm.isBlank()){
+            List<SiteUser> temp = new ArrayList<SiteUser>(allUsers);
+            for (SiteUser user : temp) {
+                if(!user.getUsername().contains(searchTerm) && !user.getEmail().contains(searchTerm)){
+                    allUsers.remove(user);
+                }
+            }
+        }
+        int totalPages = (int)Math.ceil(allUsers.size()/ControllerUtilities.VIEW_PER_PAGE), nextPage = page + 1 > totalPages ? 1 : page + 1, prevPage = page - 1 < 1 ? totalPages : page - 1;
+        
+        List<SiteUser> toDisplay = new ArrayList<SiteUser>();
+        try{
+            for(int i = min; i <= max; i++){
+                toDisplay.add(allUsers.get(i));
+            }
+        }
+        catch(Exception e){/* Less than max per page */}
 
         Object errors = model.asMap().get("errors");
         Object success= model.asMap().get("success");
@@ -124,13 +112,45 @@ public class UserController {
             passedSuccess = success.toString();
         }
         
-        model.addAttribute("role", role);
-        model.addAttribute("username", username);
-        model.addAttribute("year", controllerUtilities.getYear());
-        model.addAttribute("company", "TempCompany");
+        controllerUtilities.prepareBaseModel(model, role, username);
+        controllerUtilities.preparePagingModel(model, passedErrors, passedSuccess, nextPage, prevPage, searchTerm, userService.getAllUsers().size(), allUsers.size(), totalPages, page);
+        controllerUtilities.prepareModelForEntities(model, "users", toDisplay, true, "newUser", new SiteUser());
+        model.addAttribute("allSiteUsers", userService.getAllUsers());
+        return "gal";
+    }
+
+    // Calendar
+    // https://code.daypilot.org/58614/using-javascript-html5-monthly-calendar-in-spring-boot-java
+    @GetMapping("/calendar")
+    public String getCalendar(Model model, @AuthenticationPrincipal UserDetails userDetails, final HttpServletRequest request){
+        String username = userDetails == null ? "" : userDetails.getUsername(), role = controllerUtilities.getRole(username);
+
+        controllerUtilities.prepareBaseModel(model, role, username);
+        return "calendar";
+    }
+
+    // Resources and whistleblower
+    @GetMapping("/resources")
+    public String getResources(Model model, @AuthenticationPrincipal UserDetails userDetails){
+        String username = userDetails == null ? "" : userDetails.getUsername(), role = controllerUtilities.getRole(username);
+
+        Object errors = model.asMap().get("errors");
+        Object success= model.asMap().get("success");
+        List<String> passedErrors = new ArrayList<String>();
+        String passedSuccess = "";
+
+        if(errors != null){
+            passedErrors = ((ArrayList<String>)errors);
+        }
+        else if(success != null){
+            passedSuccess = success.toString();
+        }
+        
+        controllerUtilities.prepareBaseModel(model, role, username);
         model.addAttribute("newSubmission", new WhistleInfo(null, null));
         model.addAttribute("success", passedSuccess);
         model.addAttribute("errors", passedErrors);
+        model.addAttribute("resources", controllerUtilities.getResources());
         return "resources";
     }
 
@@ -163,8 +183,8 @@ public class UserController {
         if(userDetails != null){
             return "redirect:/index";
         }
-        model.addAttribute("year", controllerUtilities.getYear());
-        model.addAttribute("company", "TempCompany");
+
+        controllerUtilities.prepareBaseModel(model, null, null);
         return "loginPage";
     }
 
@@ -176,13 +196,9 @@ public class UserController {
     // Logout
 	@GetMapping("logout")
 	public String logout(@AuthenticationPrincipal UserDetails userDetails, Model model){
-        String username = userDetails.getUsername();
-        String role = controllerUtilities.getRole(username);
+        String username = userDetails.getUsername(), role = controllerUtilities.getRole(username);
 
-        model.addAttribute("role", role);
-        model.addAttribute("username", username);
-        model.addAttribute("year", controllerUtilities.getYear());
-        model.addAttribute("company", "TempCompany");
+        controllerUtilities.prepareBaseModel(model, role, username);
 		return "logout";
 	}
 
@@ -194,11 +210,9 @@ public class UserController {
     // View my pay
     @GetMapping("viewMyPay")
     public String viewMyPay(@AuthenticationPrincipal UserDetails userDetails, Model model, @RequestParam Map<String, String> params){
-        String username = userDetails.getUsername();
-        String role = controllerUtilities.getRole(username);
+        String username = userDetails.getUsername(), role = controllerUtilities.getRole(username), searchTerm = params.get("search") != null ? params.get("search") : "";
 
         SiteUser user = userService.findByUsername(username);
-        String searchTerm = params.get("search") != null ? params.get("search") : "";
         int page = params.get("page") != null ? Integer.parseInt(params.get("page")) : 1;
         int min = 0 + (page-1) * (int)ControllerUtilities.VIEW_PER_PAGE, max = ((int)ControllerUtilities.VIEW_PER_PAGE-1) + (page-1) * (int)ControllerUtilities.VIEW_PER_PAGE;
         List<PayrollData> myPayData = user.getPay();
@@ -223,31 +237,20 @@ public class UserController {
                 toDisplay.add(myPayData.get(i));
             }
         }
-        catch(Exception e){}
+        catch(Exception e){/* Less than max per page */}
 
-        model.addAttribute("role", role);
-        model.addAttribute("username", username);
-        model.addAttribute("year", controllerUtilities.getYear());
-        model.addAttribute("company", "TempCompany");
-        model.addAttribute("statements", toDisplay);
-        model.addAttribute("nextPage", nextPage);
-		model.addAttribute("prevPage", prevPage);
-        model.addAttribute("searched", searchTerm);
-        model.addAttribute("baseCount", user.getPay().size());
-        model.addAttribute("totalCount", myPayData.size());
-		model.addAttribute("totalPages", totalPages);
-		model.addAttribute("currentPage", page);
+        controllerUtilities.prepareBaseModel(model, role, username);
+        controllerUtilities.preparePagingModel(model, null, null, nextPage, prevPage, searchTerm, user.getPay().size(), myPayData.size(), totalPages, page);
+        controllerUtilities.prepareModelForEntities(model, "statements", toDisplay, false, null, null);
         return "viewMyPay";
     }
 
     // View and make requests
     @GetMapping("/viewRequests")
     public String getRequests(@AuthenticationPrincipal UserDetails userDetails, Model model, @RequestParam Map<String, String> params){
-        String username = userDetails.getUsername();
-        String role = controllerUtilities.getRole(username);
+        String username = userDetails.getUsername(), role = controllerUtilities.getRole(username), searchTerm = params.get("search") != null ? params.get("search") : "";
 
         SiteUser user = userService.findByUsername(username);
-        String searchTerm = params.get("search") != null ? params.get("search") : "";
         int page = params.get("page") != null ? Integer.parseInt(params.get("page")) : 1;
         int min = 0 + (page-1) * (int)ControllerUtilities.VIEW_PER_PAGE, max = ((int)ControllerUtilities.VIEW_PER_PAGE-1) + (page-1) * (int)ControllerUtilities.VIEW_PER_PAGE;
         List<TimeOffRequest> myRequests = user.getTimeOff();
@@ -272,7 +275,7 @@ public class UserController {
                 toDisplay.add(myRequests.get(i));
             }
         }
-        catch(Exception e){}
+        catch(Exception e){/* Less than max per page */}
 
         List<SiteUser> managedUsers = userService.getAllUsers().stream().filter(u -> u.getManagedBy() == username).collect(Collectors.toList());
 
@@ -288,23 +291,11 @@ public class UserController {
             passedSuccess = success.toString();
         }
 
-        model.addAttribute("role", role);
-        model.addAttribute("username", username);
+        controllerUtilities.prepareBaseModel(model, role, username);
+        controllerUtilities.preparePagingModel(model, passedErrors, passedSuccess, nextPage, prevPage, searchTerm, user.getTimeOff().size(), myRequests.size(), totalPages, page);
+        controllerUtilities.prepareModelForEntities(model, "requests", toDisplay, true, "newRequest", new TimeOffRequest(null, null, null));
         model.addAttribute("user", user);
-        model.addAttribute("year", controllerUtilities.getYear());
-        model.addAttribute("company", "TempCompany");
-        model.addAttribute("requests", toDisplay);
-        model.addAttribute("nextPage", nextPage);
-		model.addAttribute("prevPage", prevPage);
-        model.addAttribute("searched", searchTerm);
-        model.addAttribute("baseCount", user.getTimeOff().size());
-        model.addAttribute("totalCount", myRequests.size());
-		model.addAttribute("totalPages", totalPages);
-		model.addAttribute("currentPage", page);
         model.addAttribute("myUsers", managedUsers);
-        model.addAttribute("newRequest", new TimeOffRequest(null, null, null));
-        model.addAttribute("errors", passedErrors);
-        model.addAttribute("success", passedSuccess);
         return "viewMyRequests";
     }
 
@@ -336,8 +327,7 @@ public class UserController {
 
     @GetMapping("/editRequest")
     public String editRequest(Model model, RedirectAttributes redirectAttributes, @RequestParam(value = "id", defaultValue = "-1") int id, @AuthenticationPrincipal UserDetails userDetails){
-        String username = userDetails.getUsername();
-        String role = controllerUtilities.getRole(username);
+        String username = userDetails.getUsername(), role = controllerUtilities.getRole(username);
         
         if(id == -1){
             List<String> errors = new ArrayList<String>();
@@ -366,10 +356,7 @@ public class UserController {
             return "redirect:/viewRequests";
         }
 
-        model.addAttribute("role", role);
-        model.addAttribute("username", username);
-        model.addAttribute("year", controllerUtilities.getYear());
-        model.addAttribute("company", "TempCompany");
+        controllerUtilities.prepareBaseModel(model, role, username);
         model.addAttribute("errors", passedErrors);
         model.addAttribute("success", passedSuccess);
         model.addAttribute("editRequest", specifiedRequest);
@@ -490,10 +477,7 @@ public class UserController {
     // NEWS
     @GetMapping("/viewNews")
     public String getNews(@AuthenticationPrincipal UserDetails userDetails, Model model, @RequestParam Map<String, String> params){
-        String username = userDetails.getUsername();
-        String role = controllerUtilities.getRole(username);
-
-        String searchTerm = params.get("search") != null ? params.get("search") : "";
+        String username = userDetails.getUsername(), role = controllerUtilities.getRole(username), searchTerm = params.get("search") != null ? params.get("search") : "";
         int page = params.get("page") != null ? Integer.parseInt(params.get("page")) : 1;
         int min = 0 + (page-1) * (int)ControllerUtilities.VIEW_PER_PAGE, max = ((int)ControllerUtilities.VIEW_PER_PAGE-1) + (page-1) * (int)ControllerUtilities.VIEW_PER_PAGE;
         List<News> news = userService.getAllNews();
@@ -518,26 +502,19 @@ public class UserController {
                 toDisplay.add(news.get(i));
             }
         }
-        catch(Exception e){}
+        catch(Exception e){/* Less than max per page */}
 
-        model.addAttribute("role", role);
-        model.addAttribute("username", username);
-        model.addAttribute("year", controllerUtilities.getYear());
-        model.addAttribute("company", "TempCompany");
-        model.addAttribute("news", toDisplay);
-        model.addAttribute("nextPage", nextPage);
-		model.addAttribute("prevPage", prevPage);
-        model.addAttribute("searched", searchTerm);
-        model.addAttribute("baseCount", userService.getAllNews().size());
-        model.addAttribute("totalCount", news.size());
-		model.addAttribute("totalPages", totalPages);
-		model.addAttribute("currentPage", page);
+        controllerUtilities.prepareBaseModel(model, role, username);
+        controllerUtilities.preparePagingModel(model, null, null, nextPage, prevPage, searchTerm, userService.getAllNews().size(), news.size(), totalPages, page);
+        controllerUtilities.prepareModelForEntities(model, "news", toDisplay, false, null, null);
         return "viewNews";
     }
 
     @GetMapping("/test")
     public String test(){
-        userService.clearPostings();
+        SiteUser user = userService.findByUsername("root.user");
+        user.setEntitledDays(3);
+        userService.saveUser(user);
         return "redirect:/index";
     }
 

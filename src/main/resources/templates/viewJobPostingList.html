@@ -12,7 +12,8 @@
         <header>
             <div>
                 <a href="/index">
-                    <img th:src="@{/img/defaultLogo.png}" alt="Default HRIS logo" width="108px" height="60px"/>
+                    <img th:if="${!#strings.isEmpty(logo)}" th:src="@{'/img/' + ${logo}}" alt="HRIS logo" width="108px" height="60px"/>
+                    <img th:unless="${!#strings.isEmpty(logo)}" th:src="@{/img/defaultLogo.png}" alt="HRIS logo" width="108px" height="60px"/>
                 </a>
             </div>
             <div class="scrollmenu">
@@ -112,7 +113,8 @@
         <header>
             <div>
                 <a href="/candidateHome">
-                    <img th:src="@{/img/defaultLogo.png}" alt="Default HRIS logo" width="108px" height="60px"/>
+                    <img th:if="${!#strings.isEmpty(logo)}" th:src="@{'/img/' + ${logo}}" alt="HRIS logo" width="108px" height="60px"/>
+                    <img th:unless="${!#strings.isEmpty(logo)}" th:src="@{/img/defaultLogo.png}" alt="HRIS logo" width="108px" height="60px"/>
                 </a>
             </div>
         </header>
@@ -124,14 +126,14 @@
                     Employment opportunities will be posted on this website and on recruitment websites.
                     If you don't match all the requirements, apply anyway! We'd like to talk with you and see
                     if you'd be a good fit for <span th:text="${company}"></span>! Please submit your resume to
-                    <span style="text-decoration: underline; font-weight: bold;">email here</span> and quote the position number you are applying for. Resumes must
+                    <a style="font-weight: bold;" th:text="${hrEmail}" th:href="@{'/mailto:' + ${hrEmail}}"></a> and quote the position number you are applying for. Resumes must
                     and/or cover letters must be submitted in either MSWord or PDF formats.
                 </p>
 
                 <p>
                     <span th:text="${company}"></span> is committed to providing accomodation to applicants with disabilties
                     If you require accomodation for any part of the recruitment process, pleast contact Human Resources at 
-                    <span style="text-decoration: underline; font-weight: bold;">email here</span> and we will work with you to meet your needs.
+                    <a style="font-weight: bold;" th:text="${hrEmail}" th:href="@{'/mailto:' + ${hrEmail}}"></a> and we will work with you to meet your needs.
                 </p>
 
                 <p>If you are an internal employee, you may speak to HR about benefits regarding referring employees and moving forward in your career journey.</p>

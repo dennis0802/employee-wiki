@@ -8,6 +8,8 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.util.List;
+
 @Entity
 @Getter @Setter @NoArgsConstructor
 public class CustomWebAppElement {
@@ -16,10 +18,13 @@ public class CustomWebAppElement {
     private Long id;
 
     private String description;
-    private Object object;
+    private String content;
+    private String contentLink;
+    private List<String> contentList;
 
-    public CustomWebAppElement(String description, Object object){
+    public CustomWebAppElement(String description, String content, String contentLink){
         this.description = description;
-        this.object = object;
+        this.content = content;
+        this.contentLink = contentLink;
     }
 }

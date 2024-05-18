@@ -11,7 +11,8 @@
         <header>
             <div>
                 <a href="/index">
-                    <img th:src="@{/img/defaultLogo.png}" alt="Default HRIS logo" width="108px" height="60px"/>
+                    <img th:if="${!#strings.isEmpty(logo)}" th:src="@{'/img/' + ${logo}}" alt="HRIS logo" width="108px" height="60px"/>
+                    <img th:unless="${!#strings.isEmpty(logo)}" th:src="@{/img/defaultLogo.png}" alt="HRIS logo" width="108px" height="60px"/>
                 </a>
             </div>
         </header>
@@ -33,6 +34,7 @@
         </div>
 
         <footer>
+            &copy; <span th:text="${year}"></span> <span th:text="${company}">, All rights reserved.</span> <br/>
             Powered by Employee Wiki&trade; <br/>
             <a href="#top">Back to Top</a>
         </footer>

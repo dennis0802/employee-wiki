@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org" lang="en">
+    <head>
+        <meta charset="utf-8" />
+        <link rel="stylesheet" media="all" th:href="@{/styles.css}">
+        <link rel="icon" type="image/x-icon" th:href="@{/img/favicon.ico}">
+        <title>Edit Element</title>
+    </head>
+
+    <body>
+        <header>
+            <div>
+                <a href="/index">
+                    <img th:if="${!#strings.isEmpty(logo)}" th:src="@{'/img/' + ${logo}}" alt="HRIS logo" width="108px" height="60px"/>
+                    <img th:unless="${!#strings.isEmpty(logo)}" th:src="@{/img/defaultLogo.png}" alt="HRIS logo" width="108px" height="60px"/>
+                </a>
+            </div>
+            <div class="scrollmenu">
+                <a href="/hrMenu" th:if="${!#strings.isEmpty(username) and #strings.equals(role, 'ADMIN')}"><b>Back to HR/Payroll Menu</b></a>
+            </div>
+        </header>
+
+        <div id="page">
+            <div style="text-align: center;">
+                <div th:if="${!#lists.isEmpty(errors)}">
+                    <p style="color:red;font-weight: bold;">ERRORS</p>
+                    <ul style="list-style-position: inside;padding-left: 0;">
+                        <li style="color:red" th:each="error : ${errors}" th:text="${error}"></li>
+                    </ul>
+                </div>
+
+                <h2>Edit Element</h2>
+                <a th:if="${#strings.equals(role, 'ADMIN')}" href="/adminAppElements"><button class="button buttonTheme">Return to Elements</button></a><br/>
+                <ul style="list-style-position: inside;">
+                    <li>In order for users to fully see new app elements, changes in the application must be made.</li>
+                    <li>While the base application has been assured to be working, please contact <a href="mailto:dennisdao2001@gmail.com">dennisdao2001@gmail.com</a> for any issues related to the base application.</li>
+                    <li>Only one type of content will be allowed per element <b>(as text content, as text list, or as a file)</b></li>
+                    <li>Ensure elements exist for <i><b>company</b></i>, <i><b>hrEmail</b></i>, <i><b>companyLogo</b></i>, <i><b>orgChart</b></i>, and <i><b>resourceList</b></i>.</li>
+                    <ul>
+                        <li><i><b>company</b></i> should be the company's name.</li>
+                        <li><i><b>hrEmail</b></i> should be your HR's preferred email.</li>
+                        <li><i><b>companyLogo</b></i> should be an image file containg your company logo, preferably [dimensions here].</li>
+                        <li><i><b>orgChart</b></i> should be your company's org chart as an image.</li>
+                        <li><i><b>resourceList</b></i> should be a list of resources that can be formatted into a bullet point list for the Resources page.</li>
+                    </ul>
+                    <li>If inputting as a text list, please separate your arguments with a comma and no spaces in between (ie. [element1],[element2])</li>
+                    <li>If you do not want to change the content, leave the content fields as is.</li>
+                </ul>
+
+                <form th:action="@{'/adminEditElement?id=' + ${element.id}}" method="post" th:object="${element}" enctype="multipart/form-data">
+                    <label for="desc">*Description: </label><br/>
+                    <input type="text" name="desc" th:field="*{description}" /><br/><br/>
+
+                    <label for="list">Is Content List?</label><br/>
+                    <input type="checkbox" name="list" /><br/><br/>
+
+                    <label for="content">Content (as text); 
+                        <span th:if="${!#strings.isEmpty(element.contentList)}">currently a list</span>
+                        <span th:if="${#strings.isEmpty(element.contentList) and !#strings.isEmpty(element.content)}">currently text</span>
+                        <span th:if="${#strings.isEmpty(element.contentList) and #strings.isEmpty(element.content)}">currently using a file</span>
+                    </label><br/>
+                    <textarea name="content" rows="25" cols="50" wrap="hard" maxlength="255" style="font-family:Times New Roman, Times, serif; font-size: 12px; white-space: pre-wrap;">
+    
+                    </textarea><br/><br/>
+
+                    <label for="contentLink">Content (as a pdf or image file) [currently <span th:text="${element.contentLink}"></span>]: </label><br/>
+                    <input type="file" name="file" accept=".pdf,image/*" ><br/><br/>
+
+                    <input type="submit" value="Edit Element"/>
+                </form>
+            </div>
+            <br/><br/>
+        </div>
+
+        <footer>
+            &copy; <span th:text="${year}"></span> <span th:text="${company}">, All rights reserved.</span> <br/>
+            Powered by Employee Wiki&trade; <br/>
+            <a href="#top">Back to Top</a>
+        </footer>
+    </body>
+</html>
