@@ -4,18 +4,12 @@ import com.development.hris.entities.*;
 import com.development.hris.token.PasswordRefreshToken;
 import com.development.hris.token.PasswordTokenRepository;
 
-import jakarta.persistence.EntityManager;
-import jakarta.persistence.PersistenceContext;
-
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.stream.Collectors;
 import java.util.Calendar;
 
-import java.sql.Connection;
-
-import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
