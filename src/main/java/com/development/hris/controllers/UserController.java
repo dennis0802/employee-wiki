@@ -8,7 +8,9 @@ import com.development.hris.entities.SiteUser;
 import com.development.hris.entities.TimeOffComparator;
 import com.development.hris.entities.TimeOffRequest;
 import com.development.hris.entities.WhistleInfo;
+import com.development.hris.events.ResetCompleteEvent;
 import com.development.hris.service.*;
+import com.development.hris.token.PasswordRefreshToken;
 
 import jakarta.servlet.http.HttpServletRequest;
 
@@ -19,7 +21,9 @@ import java.util.Map;
 import java.util.regex.Pattern;
 import java.util.regex.Matcher;
 import java.util.stream.Collectors;
+import java.util.Calendar;
 
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
@@ -40,6 +44,7 @@ import lombok.extern.slf4j.Slf4j;
 public class UserController {
     private final UserService userService;
     private final ControllerUtilities controllerUtilities;
+    private final ApplicationEventPublisher publisher;
 
     @GetMapping({"/", "/index"})
     public String getIndex(Model model, @AuthenticationPrincipal UserDetails userDetails){
@@ -56,8 +61,16 @@ public class UserController {
             }
         }
         catch(Exception e){/* Less than max per page */}
+
+        Object success= model.asMap().get("success");
+        String passedSuccess = "";
+
+        if(success != null){
+            passedSuccess = success.toString();
+        }
  
         controllerUtilities.prepareBaseModel(model, role, username);
+        model.addAttribute("success", passedSuccess);
         model.addAttribute("news", toDisplay);
         return "index";
     }
@@ -189,7 +202,8 @@ public class UserController {
     }
 
     @PostMapping("/login")
-    public String postLogin(){
+    public String postLogin(RedirectAttributes redirectAttributes, @RequestParam("username") String username){
+        redirectAttributes.addFlashAttribute("success", "Welcome back, " + username + "!");
         return "redirect:/index";
     }
 
@@ -626,12 +640,165 @@ public class UserController {
         return "redirect:/yourAccount";
     }  
 
-    @GetMapping("/test")
-    public String test(){
-        SiteUser user = userService.findByUsername("root.user");
-        user.setEntitledDays(3);
-        userService.saveUser(user);
-        return "redirect:/index";
+    // PASSWORD RESET
+    @GetMapping("/forgotPassword")
+    public String forgotPassword(Model model, @AuthenticationPrincipal UserDetails userDetails){
+        String username = userDetails == null ? "" : userDetails.getUsername(), role = controllerUtilities.getRole(username);
+
+        if(!username.isBlank()){
+            return "redirect:/yourAccount";
+        }
+
+        // Check for failure to display
+		Object errors = model.asMap().get("errors");
+		List<String> passedErrors = new ArrayList<String>();
+
+        if(errors != null){
+            passedErrors = ((ArrayList<String>)errors);
+        }
+
+        controllerUtilities.prepareBaseModel(model, role, username);
+        model.addAttribute("errors", passedErrors);
+        return "forgotPassword";
     }
+
+    @PostMapping("/forgotPassword")
+    public String submitPasswordReset(@RequestParam(name="email") String email, RedirectAttributes redirectAttributes, final HttpServletRequest request){
+        List<String> errors = new ArrayList<String>();
+
+        Pattern pattern = Pattern.compile("^[A-Z0-9._%+-]+@[A-Z0-9.-]+\\.[A-Z]{2,6}$", Pattern.CASE_INSENSITIVE);
+        Matcher matcher = pattern.matcher(email);
+        if(!matcher.matches()){
+            errors.add("The email address is invalid.");
+        }
+
+        if(errors.size() > 0){
+            redirectAttributes.addFlashAttribute("errors", errors);
+            return "redirect:/forgotPassword";
+        }
+
+        // Send the email here
+        publisher.publishEvent(new ResetCompleteEvent(email, applicationUrl(request)));
+        log.info("Password request submitted using " + email);
+        redirectAttributes.addFlashAttribute("success", "Success! You will get an email with further instructions if it is associated to your account.");
+        return "redirect:/forgotPassword";
+    }
+
+    @GetMapping("/resetPassword")
+	public String resetPassword(@RequestParam("token") String token, RedirectAttributes redirectAttributes){
+        List<String> errors = new ArrayList<String>();
+        PasswordRefreshToken refreshToken = userService.getTokenWithString(token);
+        Calendar calendar = Calendar.getInstance();
+
+		// No user exists with that token
+		if(refreshToken == null){
+            errors.add("That token is invalid to verify.");
+			redirectAttributes.addFlashAttribute("errors", errors);
+            return "redirect:/forgotPassword";
+		}
+
+        if((refreshToken.getExpirationTime().getTime() - calendar.getTime().getTime()) > 0){
+            return "redirect:/changePassword?token=" + token;
+        }
+
+		// Invalid token
+        userService.deleteToken(refreshToken);
+        errors.add("That token is invalid to verify.");
+        redirectAttributes.addFlashAttribute("errors", errors);
+        return "redirect:/forgotPassword";
+	}
+
+    // Changing the password
+    @GetMapping("/changePassword")
+    public String changePassword(@RequestParam("token") String token, Model model, RedirectAttributes redirectAttributes){
+        List<String> errors = new ArrayList<String>();
+
+        if(token == null){
+            errors.add("That token is invalid.");
+			redirectAttributes.addFlashAttribute("errors", errors);
+            return "redirect:/forgotPassword";
+        }
+
+        PasswordRefreshToken passToken = userService.getTokenWithString(token);
+        if(passToken == null){
+            errors.add("That token is invalid.");
+			redirectAttributes.addFlashAttribute("errors", errors);
+            return "redirect:/forgotPassword";
+        }
+
+        model.addAttribute("token", token);
+        controllerUtilities.prepareBaseModel(model, null, null);
+        return "changePassword";
+    }
+
+    @PostMapping("/changePassword")
+    public String changePasswordSubmitted(@ModelAttribute SiteUser user, @RequestParam("token") String token, Model model, RedirectAttributes redirectAttributes,
+                                          @RequestParam("password") String password, @RequestParam("confirmPassword") String confirmPassword){
+        List<String> errors = new ArrayList<String>();                
+        if(token == null){
+            errors.add("That token is invalid.");
+			redirectAttributes.addFlashAttribute("errors", errors);
+            return "redirect:/forgotPassword";
+        }
+
+        PasswordRefreshToken passToken = userService.getTokenWithString(token);
+        if(passToken == null){
+            errors.add("That token is invalid.");
+			redirectAttributes.addFlashAttribute("errors", errors);
+            return "redirect:/forgotPassword";
+        }
+
+        // A valid password has at least 12 characters, containing 1 digit, 1 lowercase character, 1 uppercase character, and 1 special character
+        Pattern pattern = Pattern.compile("^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d)(?=.*[@$!%*?&])[A-Za-z\\d@$!%*?&]{12,}$");
+        Matcher matcher = pattern.matcher(password);
+
+        if(!matcher.matches()){
+            errors.add("The password is invalid.");
+			redirectAttributes.addFlashAttribute("errors", errors);
+            return "redirect:/changePassword?token=" + token;
+        }
+
+        if(confirmPassword.isBlank()){
+            errors.add("You must confirm your password.");
+			redirectAttributes.addFlashAttribute("errors", errors);
+            return "redirect:/changePassword?token=" + token;
+        }
+
+        // The password inputs should match
+		if(!password.isBlank() && !confirmPassword.isBlank() && !password.equals(confirmPassword)){
+            errors.add("The password is invalid.");
+			redirectAttributes.addFlashAttribute("errors", errors);
+            return "redirect:/changePassword?token=" + token;
+		}
+
+        SiteUser toReset = passToken.getUser();
+        if(toReset == null){
+            errors.add("That token is invalid.");
+			redirectAttributes.addFlashAttribute("errors", errors);
+            return "redirect:/forgotPassword";
+        }
+
+        // Upon successful password, save to user and then delete the token
+        String result = userService.validateResetTokenAndSetPassword(token, password);
+        if(result.equalsIgnoreCase("valid")){
+            userService.deleteToken(passToken);
+            redirectAttributes.addFlashAttribute("success", "Your password has been reset! Please log in to ensure access.");
+            log.info("A user has reset their password.");
+            return "redirect:/index";
+        }
+
+        errors.add("That token is invalid.");
+        redirectAttributes.addFlashAttribute("errors", errors);
+        return "redirect:/forgotPassword";
+    }
+
+    /**
+	 * Create the token url
+	 * @param request
+	 * @return The token url
+	 */
+	private String applicationUrl(HttpServletRequest request){
+		return "http://" + request.getServerName() + ":" + request.getServerPort() + request.getContextPath();
+	}
 
 }

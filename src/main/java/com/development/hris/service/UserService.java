@@ -1,6 +1,8 @@
 package com.development.hris.service;
 
 import com.development.hris.entities.*;
+import com.development.hris.token.PasswordRefreshToken;
+import com.development.hris.token.PasswordTokenRepository;
 
 import java.util.ArrayList;
 import java.util.Date;
@@ -25,7 +27,7 @@ public class UserService implements IUserService{
     private final WhistleInfoRepository whistleInfoRepository;
     private final CustomWebAppElementRepository customWebAppElementRepository;
     private final OpenJobRepository openJobRepository;
-    //private final ControllerUtilities controllerUtilities;
+    private final PasswordTokenRepository passwordRepository;
 
     public SiteUser addUser(String username, String password, String email, String altEmail, String role, String phoneNum, String workLocation, String firstName, String lastName, 
                         String jobTitle, int entitledDays, String managedBy, Date joinDate){
@@ -271,10 +273,6 @@ public class UserService implements IUserService{
         return openJobRepository.findById(id);
     }
 
-    public void clearPostings(){
-        openJobRepository.deleteAll();
-    }
-
     public void deleteJob(long id){
         openJobRepository.deleteById(id);
     }
@@ -298,5 +296,42 @@ public class UserService implements IUserService{
 
     public void deleteElement(long id){
         customWebAppElementRepository.deleteById(id);
+    }
+
+    // RESET
+    public void saveUserResetToken(SiteUser user, String resetToken){
+        var verification = new PasswordRefreshToken(resetToken, user);
+        passwordRepository.save(verification);
+    }
+
+    public String validateResetTokenAndSetPassword(String verifyToken, String rawPass){
+        PasswordRefreshToken token = passwordRepository.findByToken(verifyToken);
+
+        // Invalid token
+        if(token.equals(null)){
+            return "invalid";
+        }
+
+        SiteUser user = token.getUser();
+        Calendar calendar = Calendar.getInstance();
+
+        // Expired token
+        if((token.getExpirationTime().getTime() - calendar.getTime().getTime()) <= 0){
+            passwordRepository.delete(token);
+            return "expired";
+        }
+        BCryptPasswordEncoder encoder = new BCryptPasswordEncoder();
+        user.setPassword(encoder.encode(rawPass));
+        userRepository.save(user);
+
+        return "valid";
+    }
+
+    public PasswordRefreshToken getTokenWithString(String token){
+        return passwordRepository.findByToken(token);
+    }
+
+    public void deleteToken(PasswordRefreshToken token){
+        passwordRepository.delete(token);
     }
 }

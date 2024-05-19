@@ -34,6 +34,7 @@
             <div style="text-align: center;">
                 <h1 th:if="${!#strings.isEmpty(company)}"><span th:text="${company}"></span> Employee Wiki</h1>
                 <h1 th:unless="${!#strings.isEmpty(company)}">Employee Wiki</h1>
+                <p style="color:green" th:if="${!#strings.isEmpty(success)}" th:text="${success}"></p>
                 <img id="landingImg" th:src="@{/img/hris.jpg}" alt="Default HRIS image" />
                 <p>
                     Welcome to Employee Wiki, the wikipedia and employee platform for all your employee experience needs. Here, you can view your company information,
@@ -76,8 +77,6 @@
                                 if you need help logging in.
                             </b>
                         </p>
-
-                        <a href="/forgotPassword">If you have forgotten your password, click here to go through the reset process!</a>
 
                         <p>
                             <a href="/candidateHome">

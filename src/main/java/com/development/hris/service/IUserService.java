@@ -3,6 +3,7 @@ package com.development.hris.service;
 import java.util.Date;
 import java.util.List;
 
+import com.development.hris.entities.CustomWebAppElement;
 import com.development.hris.entities.Event;
 import com.development.hris.entities.News;
 import com.development.hris.entities.OpenJob;
@@ -10,6 +11,7 @@ import com.development.hris.entities.PayrollData;
 import com.development.hris.entities.SiteUser;
 import com.development.hris.entities.TimeOffRequest;
 import com.development.hris.entities.WhistleInfo;
+import com.development.hris.token.PasswordRefreshToken;
 
 public interface IUserService {
     /**
@@ -221,4 +223,67 @@ public interface IUserService {
      * @param id The id of the posting to delete
      */
     void deleteJob(long id);
+
+    // WEB ELEMENTS
+    /**
+     * Get an app element by description
+     * @param description The description of the app element
+     * @return The app element with the description, or null otherwise
+     */
+    CustomWebAppElement getElementByDescription(String description);
+
+    /**
+     * Get all app elements
+     * @return A list of app elements
+     */
+    List<CustomWebAppElement> getAllElements();
+
+    /**
+     * Get an app element by id
+     * @param id The id of the app element
+     * @return The app element with the id, or null otherwise
+     */
+    CustomWebAppElement getElementById(long id);
+
+    /**
+     * Add or edit an app element
+     * @param element The app element to add/edit
+     * @return The app element
+     */
+    CustomWebAppElement addOrEditElement(CustomWebAppElement element);
+
+    /**
+     * Delete an app element
+     * @param id The id of the app element
+     */
+    void deleteElement(long id);
+
+    // PASSWORD RESET
+    /**
+     * Save a user's reset token
+     * @param user The user
+     * @param resetToken The reset token
+     */
+    void saveUserResetToken(SiteUser user, String resetToken);
+
+    /**
+     * Validate a reset token and set the new password
+     * @param verifyToken The token verifying this user
+     * @param rawPass The raw password to be encoded
+     * @return The result of validation - "valid", "expired", or "invalid"
+     */
+    String validateResetTokenAndSetPassword(String verifyToken, String rawPass);
+
+    /**
+     * Find a token with its string
+     * @param token The token string
+     * @return The password refresh token with that string, null otherwise
+     */
+    PasswordRefreshToken getTokenWithString(String token);
+
+    /**
+     * Delete a password refresh token
+     * @param token The token to delete
+     */
+    void deleteToken(PasswordRefreshToken token);
 }

@@ -677,6 +677,4 @@ public class AdminController {
         redirectAttributes.addFlashAttribute("success", "User deleted!");
         return "redirect:/gal";
     }
-
-    //TODO: password recovery, merge the view pages as much as possible, CSS responsive design
 }

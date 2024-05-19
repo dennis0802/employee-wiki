@@ -62,4 +62,8 @@ public class EmailService {
         transport.sendMessage(message, message.getAllRecipients());
 
     }
+
+    public void sendResetEmail(){
+        
+    }
 }
