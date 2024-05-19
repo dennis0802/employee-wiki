@@ -113,6 +113,7 @@ public class HrController {
         controllerUtilities.prepareBaseModel(model, role, username);
         controllerUtilities.preparePagingModel(model, passedErrors, passedSuccess, nextPage, prevPage, searchTerm, userService.getAllPayData().size(), allPayroll.size(), totalPages, page);
         controllerUtilities.prepareModelForEntities(model, "statementsAsHR", toDisplay, true, "statementNew", new PayrollData());
+        model.addAttribute("usersPay", allUsers);
         return "viewTemplate";
     }
 

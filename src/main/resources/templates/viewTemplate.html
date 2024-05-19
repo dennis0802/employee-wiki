@@ -312,7 +312,7 @@
                     <label for="user">*User: </label><br/>
                     <select name="user" id="user">
                         <option value="" selected="selected" hidden="hidden">Select a user...</option>
-                        <option th:each="user : ${users}" th:value="${user.username}" th:text="${user.firstName} + ' ' + ${user.lastName}"></option>
+                        <option th:each="user : ${usersPay}" th:value="${user.username}" th:text="${user.firstName} + ' ' + ${user.lastName}"></option>
                     </select><br/><br/>
                     <label for="startDate">*Start Date: </label><br/>
                     <input type="date" name="startDate" th:field="*{startDate}" /><br/><br/>

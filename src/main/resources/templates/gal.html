@@ -151,7 +151,7 @@
                     <label for="managedBy">Manager</label><br/>
                     <select name="managedBy" id="managedBy">
                         <option value="" selected="selected" hidden="hidden">Select a user...</option>
-                        <option th:each="user : ${allSiteUsers}" th:value="${user.username}" th:if="${!#strings.equals(username, user.username)}" th:text="${user.firstName} + ' ' + ${user.lastName}"></option>
+                        <option th:each="user : ${allSiteUsers}" th:value="${user.username}" th:if="${!#strings.equals('root.user', user.username)}" th:text="${user.firstName} + ' ' + ${user.lastName}"></option>
                     </select><br/><br/>
 
                     <label for="role">*Role</label><br/>
