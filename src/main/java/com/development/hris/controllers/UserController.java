@@ -482,7 +482,7 @@ public class UserController {
         request.setManagerViewed(true);
         userService.setRequestStatus(request, specifiedUser);
 
-        controllerUtilities.checkForCompletedRequest(request);
+        controllerUtilities.checkForCompletedRequest(request, specifiedUser);
         redirectAttributes.addFlashAttribute("success", approval.equals("true") ? "Request approved!" : "Request denied!");
         log.info("Manager to request id#" + id + " viewed request.");
         return "redirect:/viewRequests";

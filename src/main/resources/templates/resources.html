@@ -2,6 +2,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org" lang="en">
     <head>
         <meta charset="utf-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <link rel="stylesheet" media="all" th:href="@{/styles.css}">
         <link rel="icon" type="image/x-icon" th:href="@{/img/favicon.ico}">
         <title>Resources</title>
@@ -51,7 +52,7 @@
                     <label for="subject">*Subject:</label><br/>
                     <input type="text" name="subject" th:field="*{subject}"/><br/><br/>
                     <label for="content">*Content: </label><br/>
-                    <textarea name="content" rows="25" cols="50" wrap="hard" maxlength="255" th:field="*{content}" style="font-family:Times New Roman, Times, serif; font-size: 12px;">
+                    <textarea name="content" rows="25" cols="35" wrap="hard" maxlength="255" th:field="*{content}">
 
                     </textarea><br/><br/>
                     <input type="submit" value="Submit Submission" />

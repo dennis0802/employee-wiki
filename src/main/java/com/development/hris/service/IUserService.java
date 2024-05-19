@@ -42,6 +42,20 @@ public interface IUserService {
     public SiteUser findByUsername(String username);
 
     /**
+     * Find a user by email
+     * @param email The email to search for
+     * @return The user, or null if cannot find a user
+     */
+    public SiteUser findByEmail(String email);
+
+    /**
+     * Find a user by id
+     * @param id The id to search for
+     * @return The user, or null if cannot find a user
+     */
+    public SiteUser findUserById(long id);
+
+    /**
      * Toggle whether a user is archived (enabled)
      * @param username The user's username
      * @param isArchiving Is the user being archived?

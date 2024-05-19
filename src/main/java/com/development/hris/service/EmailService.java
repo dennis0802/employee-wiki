@@ -20,15 +20,9 @@ import lombok.RequiredArgsConstructor;
 
 @Service
 @RequiredArgsConstructor
-public class EmailService {
+public class EmailService implements IEmailService{
     private final JavaMailSender mailSender;
 
-    /**
-     * Send the verification email
-     * @param url The url for the user to verify their email
-     * @throws MessagingException
-     * @throws UnsupportedEncodingException
-     */
     public void sendRequestStatusEmail(SiteUser user, TimeOffRequest request, boolean status) throws MessagingException, UnsupportedEncodingException{
         String subject = "Time Off Request ID#" + request.getId().toString();
         String content = status ?
@@ -61,9 +55,5 @@ public class EmailService {
         transport.connect("smtp.gmail.com", 587, System.getenv("APP_EMAIL"), System.getenv("APP_PASSWORD"));
         transport.sendMessage(message, message.getAllRecipients());
 
-    }
-
-    public void sendResetEmail(){
-        
     }
 }

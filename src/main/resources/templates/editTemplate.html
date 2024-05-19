@@ -2,6 +2,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org" lang="en">
     <head>
         <meta charset="utf-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <link rel="stylesheet" media="all" th:href="@{/styles.css}">
         <link rel="icon" type="image/x-icon" th:href="@{/img/favicon.ico}">
         <title th:if="${user != null}">Edit Account</title>
@@ -210,7 +211,7 @@
                         <span th:if="${#strings.isEmpty(element.contentList) and !#strings.isEmpty(element.content)}">currently text</span>
                         <span th:if="${#strings.isEmpty(element.contentList) and #strings.isEmpty(element.content)}">currently using a file</span>
                     </label><br/>
-                    <textarea name="content" rows="25" cols="50" wrap="hard" maxlength="255" style="font-family:Times New Roman, Times, serif; font-size: 12px; white-space: pre-wrap;">
+                    <textarea name="content" rows="25" cols="35" wrap="hard" maxlength="255">
     
                     </textarea><br/><br/>
 
@@ -274,7 +275,7 @@
                     <label for="endDate">*End Date: </label><br/>
                     <input type="date" name="endDate" th:field="*{endDate}" /><br/><br/>
                     <label for="reason">Reason: </label><br/>
-                    <textarea name="reason" th:field="*{reason}" rows="25" cols="50" wrap="hard" maxlength="255" style="font-family:Times New Roman, Times, serif; font-size: 12px;">
+                    <textarea name="reason" th:field="*{reason}" rows="25" cols="35" wrap="hard" maxlength="255">
 
                     </textarea><br/><br/>
 
@@ -322,7 +323,7 @@
                     <input type="text" name="title" th:field="*{title}" /><br/><br/>
 
                     <label for="content">*Content</label><br/>
-                    <textarea name="content" rows="25" cols="50" wrap="hard" maxlength="255" th:field="*{content}" style="font-family:Times New Roman, Times, serif; font-size: 12px; white-space: pre-wrap;">
+                    <textarea name="content" rows="25" cols="35" wrap="hard" maxlength="255" th:field="*{content}">
     
                     </textarea><br/><br/>
 

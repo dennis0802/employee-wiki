@@ -93,7 +93,7 @@ public class AdminController {
         controllerUtilities.prepareBaseModel(model, role, username);
         controllerUtilities.preparePagingModel(model, passedErrors, passedSuccess, nextPage, prevPage, searchTerm, userService.getAllElements().size(), allElements.size(), totalPages, page);
         controllerUtilities.prepareModelForEntities(model, "elements", toDisplay, true, "newElement", new CustomWebAppElement());
-        return "adminViewElements";
+        return "viewTemplate";
     }
 
     @PostMapping("/adminNewElement")

@@ -2,6 +2,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org" lang="en">
     <head>
         <meta charset="utf-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <link rel="stylesheet" media="all" th:href="@{/styles.css}">
         <link rel="icon" type="image/x-icon" th:href="@{/img/favicon.ico}">
         <title>Global Address List</title>
@@ -34,22 +35,15 @@
                 <table>
                     <tr>
                         <th>Full Name</th>
-                        <th>Username</th>
                         <th>Job Title</th>
-                        <th>Email</th>
                         <th>Phone Number</th>
                         <th>Work Location</th>
-                        <th>Reports To</th>
                     </tr>
                     <tr th:each="user : ${users}">
                         <td><span th:text="${user.firstName}"></span> <span th:text="${user.lastName}"></span></td>
-                        <td th:text="${user.username}"></td>
                         <td th:text="${user.jobTitle}"></td>
-                        <td th:text="${user.email}"></td>
                         <td th:text="${user.phoneNum}"></td>
                         <td th:text="${user.workLocation}"></td>
-                        <td th:if="${!#strings.isEmpty(user.managedBy)}" th:text="${user.managedBy}"></td>
-                        <td th:unless="${!#strings.isEmpty(user.managedBy)}">N/A</td>
                     </tr>
                 </table>
             </div>
@@ -85,30 +79,29 @@
                     <table>
                         <tr>
                             <th>Full Name</th>
-                            <th>Username</th>
-                            <th>Role</th>
                             <th>Job Title</th>
-                            <th>Email</th>
                             <th>Phone Number</th>
                             <th>Work Location</th>
-                            <th>Reports To</th>
                             <th colspan="4">Actions</th>
                         </tr>
                         <tr th:each="user : ${users}">
-                            <td><span th:text="${user.firstName}"></span> <span th:text="${user.lastName}"></span></td>
-                            <td th:text="${user.username}"></td>
-                            <td th:text="${user.role}"></td>
+                            <td>
+                                <span th:text="${user.firstName}"></span> <span th:text="${user.lastName}"></span><br/>
+                                (<span th:text="${user.role}"></span>)
+                            </td>
                             <td th:text="${user.jobTitle}"></td>
-                            <td th:text="${user.email}"></td>
                             <td th:text="${user.phoneNum}"></td>
                             <td th:text="${user.workLocation}"></td>
-                            <td th:if="${!#strings.isEmpty(user.managedBy)}" th:text="${user.managedBy}"></td>
-                            <td th:unless="${!#strings.isEmpty(user.managedBy)}">N/A</td>
-                            <td><a th:href="@{'/adminEditUser?id=' + ${user.id}}">Edit</a></td>
-                            <td th:if="${user.isEnabled}"><a th:href="@{'/adminToggle?id=' + ${user.id}}">Disable</a></td>
-                            <td th:unless="${user.isEnabled}"><a th:href="@{'/adminToggle?id=' + ${user.id}}">Enable</a></td>
-                            <td><a th:href="@{'/adminDeleteUser?id=' + ${user.id}}">Delete</a></td>
-                            <td><a th:href="@{'/adminResetUser?id=' + ${user.id}}">Reset</a></td>
+                            <td>
+                                <a th:href="@{'/adminEditUser?id=' + ${user.id}}">Edit</a><br/><br/>
+                                <a th:if="${user.isEnabled}"th:href="@{'/adminToggle?id=' + ${user.id}}">Disable</a>
+                                <a th:unless="${user.isEnabled}"><a th:href="@{'/adminToggle?id=' + ${user.id}}">Enable</a>
+                            </td>
+                            <td>
+                                <a th:href="@{'/adminResetUser?id=' + ${user.id}}">Reset</a><br/><br/>
+                                <a th:href="@{'/adminDeleteUser?id=' + ${user.id}}">Delete</a>
+                            </td>
+
                         </tr>
                     </table>
                 </div>

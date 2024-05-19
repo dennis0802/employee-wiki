@@ -2,6 +2,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org" lang="en">
     <head>
         <meta charset="utf-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <link rel="stylesheet" media="all" th:href="@{/styles.css}">
         <link rel="icon" type="image/x-icon" th:href="@{/img/favicon.ico}">
         <title th:if="${elements != null}">View App Elements</title>
@@ -69,7 +70,7 @@
                                 </ul>
                             </td>
 
-                            <td><a th:href="@{'/adminViewElement?id=' + ${element.id}}">View</a></td>
+                            <td><a th:href="@{'/adminEditElement?id=' + ${element.id}}">Edit</a></td>
                             <td><a th:href="@{'/adminDeleteElement?id=' + ${element.id}}">Delete</a></td>
                         </tr>
                     </table>
@@ -118,7 +119,7 @@
                     <input type="checkbox" name="list" /><br/><br/>
 
                     <label for="content">Content (as text)</label><br/>
-                    <textarea name="content" rows="25" cols="50" wrap="hard" maxlength="255" style="font-family:Times New Roman, Times, serif; font-size: 12px; white-space: pre-wrap;">
+                    <textarea name="content" rows="25" cols="35" wrap="hard" maxlength="255">
     
                     </textarea><br/><br/>
 
@@ -191,7 +192,7 @@
                             <td th:text="${newsPost.title}"></td>
                             <td th:text="${newsPost.author}"></td>
                             <td>
-                                <img th:if="${!#strings.isEmpty(newsPost.imageLocation)}" th:src="@{'/uploads/news/' + ${newsPost.imageLocation}}" width="320" height="180"/><br/>
+                                <img th:if="${!#strings.isEmpty(newsPost.imageLocation)}" th:src="@{'/uploads/news/' + ${newsPost.imageLocation}}" id="newsImg" /><br/>
                                 <span th:utext="${newsPost.content}"></span>
                             </td>
                             <td th:text="${newsPost.postDate}"></td>
@@ -229,7 +230,7 @@
                     <input type="text" name="title" th:field="*{title}" /><br/><br/>
 
                     <label for="content">*Content</label><br/>
-                    <textarea name="content" rows="25" cols="50" wrap="hard" maxlength="255" th:field="*{content}" style="font-family:Times New Roman, Times, serif; font-size: 12px; white-space: pre-wrap;">
+                    <textarea name="content" rows="25" cols="35" wrap="hard" maxlength="255" th:field="*{content}" >
     
                     </textarea><br/><br/>
 
@@ -298,8 +299,10 @@
                         <td><a th:href="@{'/uploads/pay/' + ${statement.dataLocation}}" th:text="${statement.dataLocation}"></a></td>
                         <td th:text="${#strings.substring(statement.startDate, 0, 10)}"></td>
                         <td th:text="${#strings.substring(statement.endDate, 0, 10)}"></td>
-                        <td><a th:href="@{'/hrEditPayroll?id=' + ${statement.id}}">Edit</a></td>
-                        <td><a th:href="@{'/hrDeletePayroll?id=' + ${statement.id}}">Delete</a></td>
+                        <td>
+                            <a th:href="@{'/hrEditPayroll?id=' + ${statement.id}}">Edit</a><br/><br/>
+                            <a th:href="@{'/hrDeletePayroll?id=' + ${statement.id}}">Delete</a>
+                        </td>
                     </tr>
                 </table>
 
@@ -371,30 +374,32 @@
                     <table>
                         <tr>
                             <th>Employee Name</th>
-                            <th>Job Title</th>
-                            <th>Employee Join Date</th>
                             <th>Request</th>
                         </tr>
                         <tr th:each="myUser : ${myUsersAsHR}">
-                            <td><span th:text="${myUser.firstName}"></span> <span th:text="${myUser.lastName}"></span></td>
-                            <td th:text="${myUser.jobTitle}"></td>
-                            <td th:text="${#strings.substring(myUser.joinDate, 0, 10)}"></td>
+                            <td>
+                                <span th:text="${myUser.firstName}"></span> <span th:text="${myUser.lastName}"></span><br/><br/>
+                                <span th:text="${myUser.jobTitle}"></span><br/><br/>
+                                <span th:text="${'Joined: ' + #strings.substring(myUser.joinDate, 0, 10)}"></span>
+                            </td>
                             <td th:if="${#lists.size(myUser.timeOff) &gt; 0}">
                                 <table>
                                     <tr>
-                                        <th>Requested Dates</th>
+                                        <th>Date</th>
                                         <th>Reason</th>
-                                        <th>Your Action</th>
-                                        <th colspan="2">Actions</th>
+                                        <th>Status</th>
+                                        <th>Actions</th>
                                     </tr>
                                     <tr th:each="request : ${myUser.timeOff}">
-                                        <td><span th:text="${#strings.substring(request.startDate, 0, 10)}"></span> - <span th:text="${#strings.substring(request.endDate, 0, 10)}"></span></td>
+                                        <td>From:<span th:text="${#strings.substring(request.startDate, 0, 10)}"></span><br/>To:<span th:text="${#strings.substring(request.endDate, 0, 10)}"></span></td>
                                         <td th:text="${request.reason}"></td>
                                         <td th:if="${!request.hrViewed}">Pending</td>
                                         <td style="color:green" th:if="${request.hrApproved and request.hrViewed}">Approved</td>
                                         <td style="color:red" th:if="${!request.hrApproved and request.hrViewed}">Denied</td>
-                                        <td><a th:href="@{'/hrActionRequest?id=' + ${request.id} + '&approval=true'}">Approve</a></td>
-                                        <td><a th:href="@{'/hrActionRequest?id=' + ${request.id} + '&approval=false'}">Deny</a></td>
+                                        <td>
+                                            <a th:href="@{'/hrActionRequest?id=' + ${request.id} + '&approval=true'}">Approve</a><br/><br/>
+                                            <a th:href="@{'/hrActionRequest?id=' + ${request.id} + '&approval=false'}">Deny</a>
+                                        </td>
                                     </tr>
                                 </table>
                             </td>
@@ -553,7 +558,7 @@
                                 <th>Posted</th>
                                 <th>Deadline</th>
                                 <th>Active</th>
-                                <th colspan="3">Actions</th>
+                                <th>Actions</th>
                             </tr>
                             <tr th:each="posting : ${postingsAsHR}">
                                 <td style="font-weight: bold;" th:text="${posting.position}"></td>
@@ -562,9 +567,13 @@
                                 <td th:text="${#strings.substring(posting.deadline, 0, 10)}"></td>
                                 <td th:if="${posting.isActive}">Active</td>
                                 <td th:unless="${posting.isActive}">Inactive</td>
-                                <td><a th:href="@{'/hrEditPosting?id=' + ${posting.id}}">Edit</a></td>
-                                <td><a th:href="@{'/hrDeletePosting?id=' + ${posting.id}}">Delete</a></td>
-                                <td><a th:href="@{'/hrTogglePosting?id=' + ${posting.id}}">Toggle Active</a></td>
+                                <td>
+                                    <a th:href="@{'/hrEditPosting?id=' + ${posting.id}}">Edit</a><br/><br/>
+                                    <a th:if="${!posting.isActive}" th:href="@{'/hrTogglePosting?id=' + ${posting.id}}">Enable</a>
+                                    <a th:unless="${!posting.isActive}" th:href="@{'/hrTogglePosting?id=' + ${posting.id}}">Disable</a>
+                                    <br/><br/>
+                                    <a th:href="@{'/hrDeletePosting?id=' + ${posting.id}}">Delete</a>
+                                </td>
                             </tr>
                         </table>
                 </div>
@@ -871,7 +880,7 @@
                         <label for="endDate">*End Date: </label><br/>
                         <input type="date" name="endDate" th:field="*{endDate}" /><br/><br/>
                         <label for="reason">Reason: </label><br/>
-                        <textarea name="reason" rows="25" cols="50" wrap="hard" maxlength="255" style="font-family:Times New Roman, Times, serif; font-size: 12px;">
+                        <textarea name="reason" rows="25" cols="35" wrap="hard" maxlength="255" >
     
                         </textarea><br/><br/>
 
@@ -888,24 +897,26 @@
                     <table>
                         <tr>
                             <th>Employee Name</th>
-                            <th>Job Title</th>
-                            <th>Employee Join Date</th>
                             <th>Request</th>
                         </tr>
                         <tr th:each="myUser : ${myUsers}">
-                            <td><span th:text="${myUser.firstName}"></span> <span th:text="${myUser.lastName}"></span></td>
-                            <td th:text="${myUser.jobTitle}"></td>
+                            <td>
+                                <span th:text="${myUser.firstName}"></span> <span th:text="${myUser.lastName}"></span><br/><br/>
+                                <span th:text="${myUser.jobTitle}"></span><br/><br/>
+                                <span th:text="${'Joined: ' + #strings.substring(myUser.joinDate, 0, 10)}"></span>
+                            </td>
+
                             <td th:text="${#strings.substring(myUser.joinDate, 0, 10)}"></td>
                             <td th:if="${#lists.size(myUser.timeOff) &gt; 0}">
                                 <table>
                                     <tr>
-                                        <th>Requested Dates</th>
+                                        <th>Date</th>
                                         <th>Reason</th>
-                                        <th>Your Action</th>
+                                        <th>Status</th>
                                         <th colspan="2">Actions</th>
                                     </tr>
                                     <tr th:each="request : ${myUser.timeOff}">
-                                        <td><span th:text="${#strings.substring(request.startDate, 0, 10)}"></span> - <span th:text="${#strings.substring(request.endDate, 0, 10)}"></span></td>
+                                        <td>From:<span th:text="${#strings.substring(request.startDate, 0, 10)}"></span><br/>To:<span th:text="${#strings.substring(request.endDate, 0, 10)}"></span></td>
                                         <td th:text="${request.reason}"></td>
                                         <td th:if="${!request.managerViewed}">Pending</td>
                                         <td style="color:green" th:if="${request.managerApproved and request.managerViewed}">Approved</td>
@@ -987,7 +998,7 @@
                             <td th:text="${newsPost.title}"></td>
                             <td th:text="${newsPost.author}"></td>
                             <td>
-                                <img th:if="${!#strings.isEmpty(newsPost.imageLocation)}" th:src="@{'/img/' + ${newsPost.imageLocation}}" width="320" height="180"/><br/>
+                                <img th:if="${!#strings.isEmpty(newsPost.imageLocation)}" th:src="@{'/img/' + ${newsPost.imageLocation}}" id="newsImg"/><br/>
                                 <span th:utext="${newsPost.content}"></span>
                             </td>
                             <td th:text="${newsPost.postDate}"></td>

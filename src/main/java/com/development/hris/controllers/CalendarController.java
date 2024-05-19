@@ -36,15 +36,6 @@ public class CalendarController {
     @Autowired
     EventRepository er;
 
-    @GetMapping("/api")
-    public String test(){
-        for (Event e: er.findAll()) {
-            System.out.println(e);
-        }
-        System.out.println("COUNT: " + er.count());
-        return "This is a test";
-    }
-
     @GetMapping("/api/events")
     @JsonSerialize(using = LocalDateTimeSerializer.class)
     Iterable<Event> events(@RequestParam("start") @DateTimeFormat(iso = ISO.DATE_TIME) LocalDateTime start, @RequestParam("end") @DateTimeFormat(iso = ISO.DATE_TIME) LocalDateTime end, @AuthenticationPrincipal UserDetails userDetails){

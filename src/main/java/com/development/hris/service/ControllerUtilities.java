@@ -18,8 +18,10 @@ import com.development.hris.entities.SiteUserComparator;
 import com.development.hris.entities.TimeOffRequest;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
 @Service
+@Slf4j
 @RequiredArgsConstructor
 public class ControllerUtilities {
     private final UserService userService;
@@ -27,51 +29,54 @@ public class ControllerUtilities {
 
     public static float VIEW_PER_PAGE = 25;
 
-    public void checkForCompletedRequest(TimeOffRequest request){
+    /**
+     * Check for a completed request
+     * @param request The time off request to check
+     * @param user The user who owns this request
+     */
+    public void checkForCompletedRequest(TimeOffRequest request, SiteUser user){
         boolean viewed = request.isHrViewed() && request.isManagerViewed();
         boolean approved = request.isHrApproved() && request.isManagerApproved();
         boolean fullApproval = viewed && approved;
         boolean notApproved = viewed && !approved;
-        SiteUser specifiedUser = null;
 
-        // Send an email when request has been actioned by both sides to the user
-        if(viewed && approved){
-            Event e = new Event();
-            LocalDateTime start = LocalDateTime.ofInstant(request.getStartDate().toInstant(), ZoneId.systemDefault()), end = LocalDateTime.ofInstant(request.getEndDate().toInstant(), ZoneId.systemDefault());
-            for (SiteUser user : userService.getAllUsers()) {
-                for (TimeOffRequest userRequest : user.getTimeOff()) {
-                    if(request.getId() == userRequest.getId()){
-                        specifiedUser = user;
-                        break;
-                    }
-                }
-            }
-
-            e.setStart(start);
-            e.setEnd(end);
-            e.setText(specifiedUser.getUsername() + ": APPROVED TIME OFF");
-            e.setPublicEvent(false);
-            specifiedUser.setEntitledDays(specifiedUser.getEntitledDays() - 1);
-
-            userService.addEventFromRequest(e, specifiedUser);
+        // User is not managed by anyone, only HR must have approved
+        if(user.getManagedBy().isBlank()){
+            fullApproval = request.isHrApproved() && request.isHrViewed();
         }
 
         // When in a production environment, the email code can be uncommented
         if(fullApproval){
+            Event e = new Event();
+            LocalDateTime start = LocalDateTime.ofInstant(request.getStartDate().toInstant(), ZoneId.systemDefault()), end = LocalDateTime.ofInstant(request.getEndDate().toInstant(), ZoneId.systemDefault());
+
+            e.setStart(start);
+            e.setEnd(end);
+            e.setText(user.getUsername() + ": APPROVED TIME OFF");
+            e.setPublicEvent(false);
+            user.setEntitledDays(user.getEntitledDays() - 1);
+
+            userService.addEventFromRequest(e, user);
+
             try {
-                System.out.println("SEND AN EMAIL!");
+                log.info("Send an email with approved request.");
                 //emailService.sendRequestStatusEmail(specifiedUser, request, true);
             } catch (Exception ex) {}
         }
 
         if(notApproved){
             try {
-                System.out.println("SEND AN EMAIL!");
+                log.info("Send an email with unapproved request.");
                 //emailService.sendRequestStatusEmail(specifiedUser, request, false);
             } catch (Exception ex) {}
         }
     }
 
+    /**
+     * Get the user's role
+     * @param username The username of the user
+     * @return The user's role, empty string otherwise
+     */
     public String getRole(String username){
         SiteUser user = userService.findByUsername(username);
 
@@ -81,21 +86,37 @@ public class ControllerUtilities {
         return "";
     }
 
+    /**
+     * Get the company string
+     * @return The company name if the element is set, COMPANY NOT SET otherwise
+     */
     public String getCompany(){
         CustomWebAppElement companyElement = userService.getElementByDescription("company");
         return companyElement == null ? "COMPANY NOT SET" : companyElement.getContent().toString();
     }
 
+    /**
+     * Get the org chart location
+     * @return The location of the orgChart if the element is set, CHART NOT SET otherwise
+     */
     public String getOrgChartLocation(){
         CustomWebAppElement chartElement = userService.getElementByDescription("orgChart");
         return chartElement == null ? "CHART NOT SET" : chartElement.getContentLink().toString();
     }
 
+    /**
+     * Get the logo
+     * @return The location of the logo if the element is set, null otherwise
+     */
     public String getLogo(){
         CustomWebAppElement logoElement = userService.getElementByDescription("logo");
         return logoElement == null ? "" : logoElement.getContentLink().toString();
     }
 
+    /**
+     * Get the current calendar year
+     * @return The current calendar year
+     */
     public int getYear(){
         Calendar calendar = Calendar.getInstance();
         calendar.setTime(new Date());
@@ -103,11 +124,19 @@ public class ControllerUtilities {
         return calendar.get(Calendar.YEAR);
     }
 
+    /**
+     * Get the resources list
+     * @return The resources list if the element is set, an empty list otherwise
+     */
     public List<String> getResources(){
         CustomWebAppElement resourceElement = userService.getElementByDescription("resourceList");
         return resourceElement == null ? new ArrayList<String>() : resourceElement.getContentList();
     }
 
+    /**
+     * Get users by their last name
+     * @return A list of site users by their last names
+     */
     public List<SiteUser> getSiteUsersOrderByLastName(){
         List<SiteUser> allUsers = userService.getAllUsers();
         SiteUserComparator userComparator = new SiteUserComparator();
@@ -116,6 +145,12 @@ public class ControllerUtilities {
         return allUsers;
     }
 
+    /**
+     * Prepare the base model
+     * @param model The model to modify
+     * @param role The role of the current user
+     * @param username The username of the current user
+     */
     public void prepareBaseModel(Model model, String role, String username){
         model.addAttribute("role", role);
         model.addAttribute("username", username);
@@ -124,6 +159,12 @@ public class ControllerUtilities {
         model.addAttribute("logo", getLogo());
     }
 
+    /**
+     * Check for a string in a resource lsit
+     * @param list The resource list to inspect
+     * @param query The search term
+     * @return False if the list or the term does not exist, true if it does exist
+     */
     public boolean checkForStringInList(List<String> list, String query){
         boolean exists = false;
 
@@ -169,6 +210,15 @@ public class ControllerUtilities {
         model.addAttribute("currentPage", currentPage);
     }
 
+    /**
+     * Prepare the model for entities
+     * @param model The model to modify
+     * @param entityName The name of each entity in the toDisplay list
+     * @param toDisplay The list of entities
+     * @param addMenuPresent Is there a menu to add more entities on the model?
+     * @param newEntityName The new entity's name
+     * @param newEntity The type of new entity (ex. SiteUser)
+     */
     public void prepareModelForEntities(Model model, String entityName, List<?> toDisplay, boolean addMenuPresent, String newEntityName, Object newEntity){
         model.addAttribute(entityName, toDisplay);
         if(addMenuPresent){
@@ -176,6 +226,10 @@ public class ControllerUtilities {
         }
     }
 
+    /**
+     * Get HR's email
+     * @return HR's email if the element is set, "[EMAIL NOT SET]" otherwise
+     */
     public String getHrEmail(){
         CustomWebAppElement companyElement = userService.getElementByDescription("hrEmail");
         return companyElement == null ? "[EMAIL NOT SET]" : companyElement.getContent().toString();

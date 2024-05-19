@@ -2,6 +2,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org" lang="en">
     <head>
         <meta charset="utf-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <link rel="stylesheet" media="all" th:href="@{/styles.css}">
         <link rel="icon" type="image/x-icon" th:href="@{/img/favicon.ico}">
         <title>Organization Chart</title>
@@ -31,7 +32,7 @@
         <div id="page">
             <div style="text-align: center;">
                 <h1>Organization Chart of <span th:text="${company}"></span></h1>
-                <img th:src="@{'/uploads/' + ${orgChartPath}}" id="orgChart" width="973px" height="878px" alt="Organization chart was unable to load or was not set."/>
+                <img th:src="@{'/uploads/' + ${orgChartPath}}" id="orgChart" alt="Organization chart was unable to load or was not set."/>
             </div>
             <br/><br/>
         </div>

@@ -34,3 +34,4 @@ build/
 
 ### Employee Wiki Folders ###
 src/main/resources/static/uploads/
+*.sql

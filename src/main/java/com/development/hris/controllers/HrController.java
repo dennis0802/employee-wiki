@@ -432,7 +432,7 @@ public class HrController {
         request.setHrApproved(approval.equals("true"));
         request.setHrViewed(true);
         userService.setRequestStatus(request, specifiedUser);
-        controllerUtilities.checkForCompletedRequest(request);
+        controllerUtilities.checkForCompletedRequest(request, specifiedUser);
 
         log.info("HR viewed time-off request id#" + request.getId());
         redirectAttributes.addFlashAttribute("success", approval.equals("true") ? "Request approved!" : "Request denied!");

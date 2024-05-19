@@ -1,16 +1,15 @@
-/* Sides of the page */
+/* Desktop */
 @media screen and (max-width: 1920px){
     #page {
         float: left;
-        width: 1100px;
-        /*height: 100%;*/
+        width: 1000px;
         padding-left: 0;
         vertical-align: top;
         background: #ffffff;
     }
 
     body {
-        width: 1100px;
+        width: 1000px;
         height: 100%;
         margin: auto;
         border: 0;
@@ -23,7 +22,7 @@
     /* Page header */
     header {
         height: 125px;
-        width: 1100px;
+        width: 1000px;
         margin: 0;
         padding: 0;
         text-align: left;
@@ -31,30 +30,65 @@
         color: #FFFFFF;
     }
 
-    .recent img{
+    footer {
+        height: 3em;
+        margin: 0;
+        padding: 1em;
+        text-align: center;
+        background: #2575de;
+        color: #FFFFFF;
+        clear: both;
+    }
+
+    table {
+        border-collapse: collapse;
+        vertical-align: top;
+        width: 1000px;
+        margin-left: auto; 
+        margin-right: auto;
+    }
+    
+    tr td {
+        border: 3px solid #999999;
+        text-align: center;
+        vertical-align: text-top;
+    }
+      
+    tr th {
+        border: 3px solid #2575de;
+        background: #2575de;
+        color: white;
+        text-align: center;
+    }
+
+    tr table{
+        width: 550px;
+    }
+
+    #newsImg{
         width: 320px;
         height: 180px;
     }
 
-    .showDisplay img{
-        width: 480px;
-        height: 270px;
+    #orgChart{
+        width: 973px;
+        height: 878px;
     }
 }
 
-@media screen and (max-width: 385px){
+/* Tablets */
+@media screen and (max-width: 990px){
     #page {
         float: left;
-        width: 385px;
-        /*height: 100%;*/
+        width: 650px;
         padding-left: 0;
         vertical-align: top;
         background: #ffffff;
     }
 
     body {
-        width: 385px;
-        height: 854px;
+        width: 650px;
+        height: 100%;
         margin: auto;
         border: 0;
         font-family: Verdana, Arial, Helvetica, sans-serif;
@@ -63,15 +97,10 @@
         background: #acd7ff;
     }
 
-    .imgContainer img {
-        width: 223px;
-        height: 200px;
-    }
-
     /* Page header */
     header {
         height: 125px;
-        width: 385px;
+        width: 650px;
         margin: 0;
         padding: 0;
         text-align: left;
@@ -79,51 +108,155 @@
         color: #FFFFFF;
     }
 
-    .recent img{
-        width: 80px;
-        height: 45px;
+    footer {
+        height: 4em;
+        margin: 0;
+        padding: 1em;
+        text-align: center;
+        background: #2575de;
+        color: #FFFFFF;
+        clear: both;
     }
 
-    .showDisplay img{
-        width: 80px;
-        height: 45px;
+    table {
+        border-collapse: collapse;
+        vertical-align: top;
+        width: 650px;
+        margin-left: auto; 
+        margin-right: auto;
+    }
+    
+    tr td {
+        border: 3px solid #999999;
+        text-align: center;
+        vertical-align: text-top;
+        font-size: 10px;
+    }
+      
+    tr th {
+        border: 3px solid #2575de;
+        background: #2575de;
+        color: white;
+        text-align: center;
+    }
+
+    tr table{
+        width: 400px;
     }
 
     #landingImg {
-        width: 223px;
+        width: 444px;
+        height: 400px;
+    }
+
+    #orgChart{
+        width: 486px;
+        height: 439px;
+    }
+
+    h2{
+        font-size: 16px;
+    }
+
+    #newsImg{
+        width: 160px;
+        height: 90px;
+    }
+}
+
+/* Smartphones */
+@media screen and (max-width: 600px){
+    h1{
+        font-size: 18px;
+    }
+
+    #page {
+        float: left;
+        width: 390px;
+        padding-left: 0;
+        vertical-align: top;
+        background: #ffffff;
+    }
+
+    body {
+        width: 390px;
+        height: 100%;
+        margin: auto;
+        border: 0;
+        font-family: Verdana, Arial, Helvetica, sans-serif;
+        font-size: 13px;
+        line-height: 15px;
+        background: #acd7ff;
+    }
+
+    /* Page header */
+    header {
+        height: 125px;
+        width: 390px;
+        margin: 0;
+        padding: 0;
+        text-align: left;
+        background: #2575de;
+        color: #FFFFFF;
+    }
+
+    #landingImg {
+        width: 222px;
         height: 200px;
     }
 
-    tr td{
+    #orgChart{
+        width: 243px;
+        height: 219px;
+    }
+
+    table {
+        border-collapse: collapse;
+        vertical-align: top;
+        width: 390px;
+        margin-left: auto; 
+        margin-right: auto;
+    }
+    
+    tr td {
+        border: 3px solid #999999;
+        text-align: center;
+        vertical-align: text-top;
         font-size: 8px;
+    }
+      
+    tr th {
+        border: 3px solid #2575de;
+        background: #2575de;
+        color: white;
+        text-align: center;
+    }
+
+    tr table{
+        width: 300px;
+    }
+
+    footer {
+        height: 6em;
+        margin: 0;
+        padding: 1em;
+        text-align: center;
+        background: #2575de;
+        color: #FFFFFF;
+        clear: both;
+    }
+
+    h2{
+        font-size: 16px;
+    }
+
+    #newsImg{
+        width: 80px;
+        height: 45px;
     }
 }
 
-textarea{
-    font-family: Verdana, Arial, Helvetica, sans-serif; 
-    font-size: 10px;
-    resize: none;
-}
-
-table {
-    border-collapse: collapse;
-    vertical-align: top;
-    width: 100%;
-}
-
-tr td {
-    border: 3px solid #999999;
-    text-align: center;
-    vertical-align: text-top;
-}
-  
-tr th {
-    border: 3px solid #2575de;
-    background: #2575de;
-    color: white;
-    text-align: center;
-}
-
+/* <button><a>... tags*/
 .button {
     border: none;
     color: #FFFFFF;
@@ -148,17 +281,7 @@ tr th {
     color: #FFFFFF;
 }
 
-/* Page header */
-footer {
-    height: 3em;
-    margin: 0;
-    padding: 1em;
-    text-align: center;
-    background: #2575de;
-    color: #FFFFFF;
-    clear: both;
-}
-
+/* Footer */
 footer a:link{
     color: #FFFFFF;
 }
@@ -170,6 +293,13 @@ footer a:visited{
 /* General form formatting */
 form{
     margin-left: 10px;
+}
+
+textarea{
+    font-family: Verdana, Arial, Helvetica, sans-serif; 
+    font-size: 12px;
+    resize: none;
+    white-space: pre-wrap;
 }
 
 /* Centre of the page content */
@@ -195,6 +325,7 @@ header a:visited{
     color:#bdbdbd
 }
 
+/* Scrollmenu */
 div.scrollmenu {
     background-color: rgb(80, 80, 80);
     overflow: auto;
@@ -218,7 +349,7 @@ div.scrollmenu a:hover {
     background-color: rgb(148, 148, 148);
 }
 
-/* Calendar toolbar */
+/* CALENDAR STYLING */
 .toolbar {
     margin-bottom: 20px;
 }
