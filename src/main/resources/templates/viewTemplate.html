@@ -998,7 +998,7 @@
                             <td th:text="${newsPost.title}"></td>
                             <td th:text="${newsPost.author}"></td>
                             <td>
-                                <img th:if="${!#strings.isEmpty(newsPost.imageLocation)}" th:src="@{'/img/' + ${newsPost.imageLocation}}" id="newsImg"/><br/>
+                                <img th:if="${!#strings.isEmpty(newsPost.imageLocation)}" th:src="@{'/uploads/news/' + ${newsPost.imageLocation}}" id="newsImg"/><br/>
                                 <span th:utext="${newsPost.content}"></span>
                             </td>
                             <td th:text="${newsPost.postDate}"></td>
