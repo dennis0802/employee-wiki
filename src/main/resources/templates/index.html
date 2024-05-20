@@ -57,7 +57,7 @@
                                 <b><span th:text="${newsPost.title}"></span><br/>
                                 By: <span th:text="${newsPost.author}"></span><br/>
                                 Posted: <span th:text="${newsPost.postDate}"></span><br/></b>
-                                <img th:if="${!#strings.isEmpty(newsPost.imageLocation)}" th:src="@{'uploads/news/' + ${newsPost.imageLocation}}" width="320" height="180"/><br/><br/>
+                                <img th:if="${!#strings.isEmpty(newsPost.imageLocation)}" th:src="@{'uploads/news/' + ${newsPost.imageLocation}}" id="newsImg"/><br/><br/>
                                 <span th:utext="${newsPost.content}"></span>
                             </td>
                         </tr>

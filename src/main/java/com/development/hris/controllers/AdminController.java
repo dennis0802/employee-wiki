@@ -256,7 +256,7 @@ public class AdminController {
             }
             
             if(!filePath.isBlank()){
-                Path oldFilePath = Paths.get(UPLOAD_DIRECTORY, filePath);
+                Path oldFilePath = element.getDescription().equals("logo") ? Paths.get(LOGO_DIRECTORY, filePath) : Paths.get(UPLOAD_DIRECTORY, filePath);
                 try {
                     Files.delete(oldFilePath);
                 }
